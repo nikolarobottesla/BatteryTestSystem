@@ -37,6 +37,7 @@ static int timeStamp[4];          //int array, stores the time a measurement was
 static int dp=0;                   //data pointer, used to indicate which element is most recent in the measured data arrays
 static int measure_time;           //declare int, stores the current measurement iteration for the entire charge or discharge cycle
 static float measure_period=1;   //period between ADC measurements in seconds
+static uint16_t rawADC[AD1_CHANNEL_COUNT];	//stores latest adc measurements
 
 
 static portTASK_FUNCTION(R_LEDblink, pvParameters) {
@@ -57,7 +58,7 @@ static portTASK_FUNCTION(control, pvParameters) {
 
 	  while(state >= chgMode){
 
-		  //measure
+		  measureAll();
 		  //check if done
 		  iteratePID();
 		  //write data
@@ -83,6 +84,10 @@ static portTASK_FUNCTION(control, pvParameters) {
 //write to file system
 //
 
+static void measureAll(void){
+	AD1_Measure(1);		//start adc conversion and wait till complete
+	AD1_GetValue16(&rawADC[0]);	//put ADC values in array rawADC
+}
 
 //PID variables
 static float PID_perCurrentSet;        	//float, stores the battery current setting scaled between 0 and 1
@@ -100,19 +105,20 @@ static float PID_output ;				//Kp * err + (Ki * intError * dt) + (Kd * difError 
 //PID function to
 static void iteratePID(void){
 	uint16_t int_PID_out;	//stores the output as an integer
-	uint16_t adcResults[AD1_CHANNEL_COUNT];	//stores latest adc measurements
 
 	if (state<=1) {}                    //if off or measuring resistance, do nothing
 		else                                //else in charge mode or discharge mode
 		{
 
-			AD1_Measure(1);		//start adc conversion and wait till complete
-			AD1_GetValue16(&adcResults[0]);
+			//read battery current depending on mode
+			if (state==chgMode)			//if in charge mode
+				perCurrent = rawADC[CHG_CURR] / 0xFFFF;
+			else if (state==disMode)	//else if in discharge mode
+				perCurrent = rawADC[DIS_CURR] / 0xFFFF;
 
 			//send error if current is too high
 			if (perCurrent > PID_perCurrentLimit)   //make sure current is reading below 7A, 7A*.003ohm*100/3.3V = 0.64
 			{
-				state = -1;     //set state to done
 				errorType = 1;  //set error type to 'current too high'
 				stop_CHG_DIS(); //run function that turns off the charge or discharge
 			}
@@ -149,6 +155,7 @@ void stop_CHG_DIS(void)
     DIS_PWM_SetRatio16(0);      //turn off discharge NFET if not already off to disconect the load from the circuit.
     WAIT1_Waitms(1000);        	//wait 1 second to allow capacitors to discharge
     CHG_PWM_SetRatio16(0);		//turn off CHG NFET to completely disconect battery from circuit
+	state = -1;     //set state to done
 }
 
 void APP_Run(void) {

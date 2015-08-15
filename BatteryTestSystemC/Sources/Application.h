@@ -22,9 +22,15 @@ void APP_Run(void);
 #define noError 0
 #define overCurrent 1
 
+//define ADC channels
+#define CHG_CURR 0
+#define DIS_CURR 1
+#define VTEMP 2
+#define VBAT_SE 3
+
 //function prototypes
 static void loadSettings(void);//
-static void measure(void);
+static void measureAll(void);
 static void chkComplete(void);
 static void writeData(void);
 static void iteratePID(void);
