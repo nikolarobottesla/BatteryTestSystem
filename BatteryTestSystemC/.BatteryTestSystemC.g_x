@@ -64,7 +64,7 @@
       <File Name="Documentation/doxygen/pex.doxyfile" FileDate="2015-07-25, 05:09:28" FileAge="1437818968835" FileType="45637" CompNumb="2" />
       <File Name="Generated_Code/BitIoLdd2.h" FileDate="2015-07-25, 05:31:43" FileAge="1437820303358" FileType="45637" CompNumb="32" />
       <File Name="Generated_Code/BitIoLdd2.c" FileDate="2015-07-25, 05:31:43" FileAge="1437820303354" FileType="45637" CompNumb="32" />
-      <File Name="Documentation/BatteryTestSystemC_SIGNALS.txt" FileDate="2015-08-16, 12:40:09" FileAge="1439746809337" FileType="3072" />
+      <File Name="Documentation/BatteryTestSystemC_SIGNALS.txt" FileDate="2015-08-20, 21:22:25" FileAge="1440123745565" FileType="3072" />
       <File Name="Generated_Code/queue.h" FileDate="2015-07-25, 05:31:43" FileAge="1437820303454" FileType="45637" CompNumb="3" />
       <File Name="Generated_Code/LEDR.h" FileDate="2015-07-26, 01:31:59" FileAge="1437892319337" FileType="45637" CompNumb="8" />
       <File Name="Generated_Code/Cpu.h" FileDate="2015-08-08, 07:42:07" FileAge="1439037727474" FileType="45637" CompNumb="2" />
@@ -175,5 +175,5 @@
       <File Name="Generated_Code/LEDG.c" FileDate="2015-07-26, 01:31:59" FileAge="1437892319314" FileType="45637" CompNumb="11" />
     </GeneratedByPE>
   </GeneratedFilesList>
-  <CodeGenReference>10</CodeGenReference>
+  <CodeGenReference>15</CodeGenReference>
 </CodeGenerationInfo>

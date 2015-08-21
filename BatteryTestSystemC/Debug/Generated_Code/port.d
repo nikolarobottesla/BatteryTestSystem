@@ -7,7 +7,7 @@ Generated_Code/port.o: ../Generated_Code/port.c \
  ../Generated_Code/list.h ../Generated_Code/portTicks.h \
  ../Generated_Code/Cpu.h ../Generated_Code/PE_Error.h \
  ../Generated_Code/PE_Const.h ../Generated_Code/IO_Map.h \
- C:/Dark\ Angel/Documents/KDS\ workspace/BatteryTestSystemC/Static_Code/IO_Map/MKL25Z4.h
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/IO_Map/MKL25Z4.h
 
 ../Generated_Code/portmacro.h:
 
@@ -39,4 +39,4 @@ Generated_Code/port.o: ../Generated_Code/port.c \
 
 ../Generated_Code/IO_Map.h:
 
-C:/Dark\ Angel/Documents/KDS\ workspace/BatteryTestSystemC/Static_Code/IO_Map/MKL25Z4.h:
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/IO_Map/MKL25Z4.h:
