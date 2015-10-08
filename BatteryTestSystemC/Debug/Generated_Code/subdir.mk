@@ -10,8 +10,6 @@ C_SRCS += \
 ../Generated_Code/AdcLdd1.c \
 ../Generated_Code/BitIoLdd1.c \
 ../Generated_Code/BitIoLdd2.c \
-../Generated_Code/BitIoLdd3.c \
-../Generated_Code/CHG_EN.c \
 ../Generated_Code/CHG_PWM.c \
 ../Generated_Code/CLS1.c \
 ../Generated_Code/CS1.c \
@@ -23,6 +21,7 @@ C_SRCS += \
 ../Generated_Code/LEDR.c \
 ../Generated_Code/LEDpin1.c \
 ../Generated_Code/LEDpin2.c \
+../Generated_Code/MINI1.c \
 ../Generated_Code/PE_LDD.c \
 ../Generated_Code/PwmLdd1.c \
 ../Generated_Code/PwmLdd2.c \
@@ -32,6 +31,7 @@ C_SRCS += \
 ../Generated_Code/SS1.c \
 ../Generated_Code/TMOUT1.c \
 ../Generated_Code/TU1.c \
+../Generated_Code/TU2.c \
 ../Generated_Code/TmDt1.c \
 ../Generated_Code/UTIL1.c \
 ../Generated_Code/Vectors.c \
@@ -45,6 +45,8 @@ C_SRCS += \
 ../Generated_Code/heap_4.c \
 ../Generated_Code/heap_5.c \
 ../Generated_Code/list.c \
+../Generated_Code/minGlue-FatFs.c \
+../Generated_Code/minIni.c \
 ../Generated_Code/port.c \
 ../Generated_Code/queue.c \
 ../Generated_Code/tasks.c \
@@ -57,8 +59,6 @@ OBJS += \
 ./Generated_Code/AdcLdd1.o \
 ./Generated_Code/BitIoLdd1.o \
 ./Generated_Code/BitIoLdd2.o \
-./Generated_Code/BitIoLdd3.o \
-./Generated_Code/CHG_EN.o \
 ./Generated_Code/CHG_PWM.o \
 ./Generated_Code/CLS1.o \
 ./Generated_Code/CS1.o \
@@ -70,6 +70,7 @@ OBJS += \
 ./Generated_Code/LEDR.o \
 ./Generated_Code/LEDpin1.o \
 ./Generated_Code/LEDpin2.o \
+./Generated_Code/MINI1.o \
 ./Generated_Code/PE_LDD.o \
 ./Generated_Code/PwmLdd1.o \
 ./Generated_Code/PwmLdd2.o \
@@ -79,6 +80,7 @@ OBJS += \
 ./Generated_Code/SS1.o \
 ./Generated_Code/TMOUT1.o \
 ./Generated_Code/TU1.o \
+./Generated_Code/TU2.o \
 ./Generated_Code/TmDt1.o \
 ./Generated_Code/UTIL1.o \
 ./Generated_Code/Vectors.o \
@@ -92,6 +94,8 @@ OBJS += \
 ./Generated_Code/heap_4.o \
 ./Generated_Code/heap_5.o \
 ./Generated_Code/list.o \
+./Generated_Code/minGlue-FatFs.o \
+./Generated_Code/minIni.o \
 ./Generated_Code/port.o \
 ./Generated_Code/queue.o \
 ./Generated_Code/tasks.o \
@@ -104,8 +108,6 @@ C_DEPS += \
 ./Generated_Code/AdcLdd1.d \
 ./Generated_Code/BitIoLdd1.d \
 ./Generated_Code/BitIoLdd2.d \
-./Generated_Code/BitIoLdd3.d \
-./Generated_Code/CHG_EN.d \
 ./Generated_Code/CHG_PWM.d \
 ./Generated_Code/CLS1.d \
 ./Generated_Code/CS1.d \
@@ -117,6 +119,7 @@ C_DEPS += \
 ./Generated_Code/LEDR.d \
 ./Generated_Code/LEDpin1.d \
 ./Generated_Code/LEDpin2.d \
+./Generated_Code/MINI1.d \
 ./Generated_Code/PE_LDD.d \
 ./Generated_Code/PwmLdd1.d \
 ./Generated_Code/PwmLdd2.d \
@@ -126,6 +129,7 @@ C_DEPS += \
 ./Generated_Code/SS1.d \
 ./Generated_Code/TMOUT1.d \
 ./Generated_Code/TU1.d \
+./Generated_Code/TU2.d \
 ./Generated_Code/TmDt1.d \
 ./Generated_Code/UTIL1.d \
 ./Generated_Code/Vectors.d \
@@ -139,6 +143,8 @@ C_DEPS += \
 ./Generated_Code/heap_4.d \
 ./Generated_Code/heap_5.d \
 ./Generated_Code/list.d \
+./Generated_Code/minGlue-FatFs.d \
+./Generated_Code/minIni.d \
 ./Generated_Code/port.d \
 ./Generated_Code/queue.d \
 ./Generated_Code/tasks.d \

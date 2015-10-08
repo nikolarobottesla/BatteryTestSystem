@@ -7,7 +7,7 @@
 **     Version     : Component 02.241, Driver 01.01, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-08-08, 07:41, # CodeGen: 6
+**     Date/Time   : 2015-09-11, 22:41, # CodeGen: 27
 **     Abstract    :
 **         This component implements a pulse-width modulation generator
 **         that generates signal with variable duty and fixed cycle. 
@@ -25,7 +25,7 @@
 **          Same period in modes                           : no
 **          Component uses entire timer                    : no
 **          Initialization                                 : 
-**            Enabled in init. code                        : yes
+**            Enabled in init. code                        : no
 **            Events enabled in init.                      : yes
 **          CPU clock/speed selection                      : 
 **            High speed mode                              : This component enabled
@@ -34,6 +34,7 @@
 **          Referenced components                          : 
 **            PWM_LDD                                      : PWM_LDD
 **     Contents    :
+**         Enable     - byte DIS_PWM_Enable(void);
 **         SetRatio16 - byte DIS_PWM_SetRatio16(word Ratio);
 **         SetDutyUS  - byte DIS_PWM_SetDutyUS(word Time);
 **
@@ -103,6 +104,23 @@ extern "C" {
 #define DIS_PWM_PERIOD_VALUE PwmLdd2_PERIOD_VALUE /* Initial period value in ticks of the timer. It is available only if the bean is enabled in high speed mode. */
 #define DIS_PWM_PERIOD_VALUE_HIGH PwmLdd2_PERIOD_VALUE_0 /* Period value in ticks of the timer in high speed mode. It is available only if the bean is enabled in high speed mode. */
 
+
+/*
+** ===================================================================
+**     Method      :  DIS_PWM_Enable (component PWM)
+**     Description :
+**         This method enables the component - it starts the signal
+**         generation. Events may be generated (<DisableEvent>
+**         /<EnableEvent>).
+**     Parameters  : None
+**     Returns     :
+**         ---             - Error code, possible codes:
+**                           ERR_OK - OK
+**                           ERR_SPEED - This device does not work in
+**                           the active speed mode
+** ===================================================================
+*/
+#define DIS_PWM_Enable() (PwmLdd2_Enable(PwmLdd2_DeviceData))
 
 /*
 ** ===================================================================

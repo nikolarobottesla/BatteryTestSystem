@@ -7,7 +7,7 @@
 **     Version     : Component 01.177, Driver 01.00, CPU db: 3.00.000
 **     Repository  : mcuoneclipse
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-26, 01:31, # CodeGen: 5
+**     Date/Time   : 2015-09-10, 20:48, # CodeGen: 22
 **     Abstract    :
 **         Implements interface to SD card for FatFs
 **     Settings    :
@@ -38,7 +38,8 @@
 **          System                                         : 
 **            Wait                                         : WAIT1
 **            Timeout                                      : TMOUT1
-**            RTOS                                         : Disabled
+**            RTOS                                         : Enabled
+**              RTOS                                       : FRTOS1
 **     Contents    :
 **         Init             - byte SD1_Init(void* unused);
 **         Deinit           - byte SD1_Deinit(void* unused);
@@ -600,6 +601,10 @@ bool SD1_ReceiveDataBlock(byte *data, word nofBytes)
       SD1_SPI_WRITE_READ(SD1_DUMMY, &tmp); /* send dummy value, poll response */
       if (tmp!=0xFF) {
         break;
+      }
+      if (TMOUT1_Value(timeout)!=(SD1_TIMEOUT_READ_BLOCK_MS/TMOUT1_TICK_PERIOD_MS)) {
+        /* polled already for a tick period: use RTOS wait in order to balance CPU cycles */
+        FRTOS1_vTaskDelay(portTICK_RATE_MS);
       }
       if (TMOUT1_CounterExpired(timeout)) {
         break;

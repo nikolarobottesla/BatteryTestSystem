@@ -7,7 +7,7 @@
 **     Version     : Component 01.164, Driver 01.11, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-08-08, 07:41, # CodeGen: 6
+**     Date/Time   : 2015-09-11, 22:41, # CodeGen: 27
 **     Abstract    :
 **          This TimerUnit component provides a low level API for unified hardware access across
 **          various timer devices using the Prescaler-Counter-Compare-Capture timer structure.
@@ -24,18 +24,8 @@
 **            Period device                                : TPM0_MOD
 **            Period                                       : 100 kHz
 **            Interrupt                                    : Disabled
-**          Channel list                                   : 2
+**          Channel list                                   : 1
 **            Channel 0                                    : 
-**              Mode                                       : Compare
-**                Compare                                  : TPM0_C2V
-**                Offset                                   : 0 µs
-**                Output on compare                        : Set
-**                  Output on overrun                      : Clear
-**                  Initial state                          : Low
-**                  Output pin                             : PTC3/LLWU_P7/UART1_RX/TPM0_CH2/CLKOUTa
-**                  Output pin signal                      : CHG_PWM
-**                Interrupt                                : Disabled
-**            Channel 1                                    : 
 **              Mode                                       : Compare
 **                Compare                                  : TPM0_C3V
 **                Offset                                   : 0 µs
@@ -46,7 +36,7 @@
 **                  Output pin signal                      : DIS_PWM
 **                Interrupt                                : Disabled
 **          Initialization                                 : 
-**            Enabled in init. code                        : yes
+**            Enabled in init. code                        : no
 **            Auto initialization                          : no
 **            Event mask                                   : 
 **              OnCounterRestart                           : Disabled
@@ -69,6 +59,7 @@
 **            Clock configuration 7                        : This component disabled
 **     Contents    :
 **         Init               - LDD_TDeviceData* TU1_Init(LDD_TUserData *UserDataPtr);
+**         Enable             - LDD_TError TU1_Enable(LDD_TDeviceData *DeviceDataPtr);
 **         GetPeriodTicks     - LDD_TError TU1_GetPeriodTicks(LDD_TDeviceData *DeviceDataPtr, TU1_TValueType...
 **         GetCounterValue    - TU1_TValueType TU1_GetCounterValue(LDD_TDeviceData *DeviceDataPtr);
 **         SetOffsetTicks     - LDD_TError TU1_SetOffsetTicks(LDD_TDeviceData *DeviceDataPtr, uint8_t...
@@ -146,16 +137,16 @@ extern "C" {
 #define TU1_CNT_INP_FREQ_R_0 23999808.00153599F /* Counter input frequency in Hz */
 #define TU1_CNT_INP_FREQ_COUNT 0U      /* Count of predefined counter input frequencies */
 #define TU1_PERIOD_TICKS   0xF0UL      /* Initialization value of period in 'counter ticks' */
-#define TU1_NUMBER_OF_CHANNELS 0x02U   /* Count of predefined channels */
+#define TU1_NUMBER_OF_CHANNELS 0x01U   /* Count of predefined channels */
 #define TU1_COUNTER_WIDTH  0x10U       /* Counter width in bits  */
 #define TU1_COUNTER_DIR    DIR_UP      /* Direction of counting */
 #define TU1_OFFSET_0_TICKS 0x00ul      /* Initialization value of offset as 'counter ticks' for channel 0 */
-#define TU1_OFFSET_1_TICKS 0x00ul      /* Initialization value of offset as 'counter ticks' for channel 1 */
 /*! Peripheral base address of a device allocated by the component. This constant can be used directly in PDD macros. */
 #define TU1_PRPH_BASE_ADDRESS  0x40038000U
   
 /* Methods configuration constants - generated for all enabled component's methods */
 #define TU1_Init_METHOD_ENABLED        /*!< Init method of the component TU1 is enabled (generated) */
+#define TU1_Enable_METHOD_ENABLED      /*!< Enable method of the component TU1 is enabled (generated) */
 #define TU1_GetPeriodTicks_METHOD_ENABLED /*!< GetPeriodTicks method of the component TU1 is enabled (generated) */
 #define TU1_GetCounterValue_METHOD_ENABLED /*!< GetCounterValue method of the component TU1 is enabled (generated) */
 #define TU1_SetOffsetTicks_METHOD_ENABLED /*!< SetOffsetTicks method of the component TU1 is enabled (generated) */
@@ -191,6 +182,27 @@ extern "C" {
 */
 /* ===================================================================*/
 LDD_TDeviceData* TU1_Init(LDD_TUserData *UserDataPtr);
+
+/*
+** ===================================================================
+**     Method      :  TU1_Enable (component TimerUnit_LDD)
+*/
+/*!
+**     @brief
+**         Enables the component - it starts the signal generation.
+**         Events may be generated (see SetEventMask). The method is
+**         not available if the counter can't be disabled/enabled by HW.
+**     @param
+**         DeviceDataPtr   - Device data structure
+**                           pointer returned by [Init] method.
+**     @return
+**                         - Error code, possible codes:
+**                           ERR_OK - OK
+**                           ERR_SPEED - The component does not work in
+**                           the active clock configuration
+*/
+/* ===================================================================*/
+LDD_TError TU1_Enable(LDD_TDeviceData *DeviceDataPtr);
 
 /*
 ** ===================================================================

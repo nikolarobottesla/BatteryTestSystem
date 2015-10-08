@@ -693,20 +693,9 @@ Module "SM1"       (component HWSPI)
                 accumulates errors in a set; after calling [GetError] this set is returned and cleared. This method is 
                 available only if the "Interrupt service/event" property is enabled.
 
-Module "CHG_EN"    (component BitIO)
-   - CHG_EN_GetVal -Returns the input/output value. If the direction is [input] then the input value of the pin is read and 
-                returned. If the direction is [output] then the last written value is returned (see <Safe mode> property for 
-                limitations). This method cannot be disabled if direction is [input].
-   - CHG_EN_PutVal -The specified output value is set. If the direction is [input], the component saves the value to a memory 
-                or a register and this value will be written to the pin after switching to the output mode (using 
-                [SetDir(TRUE)]; see <Safe mode> property for limitations). If the direction is [output], it writes the value to 
-                the pin. (Method is available only if the direction = _[output]_ or _[input/output]_).
-   - CHG_EN_ClrVal -Clears (set to zero) the output value. It is equivalent to the [PutVal(FALSE)]. This method is available 
-                only if the direction = _[output]_ or _[input/output]_.
-   - CHG_EN_SetVal -Sets (to one) the output value. It is equivalent to the [PutVal(TRUE)]. This method is available only if 
-                the direction = _[output]_ or _[input/output]_.
-
 Module "CHG_PWM"   (component PWM)
+   - CHG_PWM_Enable -This method enables the component - it starts the signal generation. Events may be generated 
+                (<DisableEvent>/<EnableEvent>).
    - CHG_PWM_SetRatio16 -This method sets a new duty-cycle ratio. Ratio is expressed as a 16-bit unsigned integer number. 0 - 
                 FFFF value is proportional to ratio 0 - 100%. The method is available only if it is not selected list of 
                 predefined values in <Starting pulse width> property.   Note: Calculated duty depends on the timer 
@@ -721,6 +710,8 @@ Module "TU1"       (component TimerUnit_LDD)
                 "yes" value then the device is also enabled (see the description of the <Enable> method). In this case the 
                 <Enable> method is not necessary and needn't to be generated. This method can be called only once. Before the 
                 second call of Init the <Deinit> must be called first.
+   - TU1_Enable -Enables the component - it starts the signal generation. Events may be generated (see SetEventMask). The 
+                method is not available if the counter can't be disabled/enabled by HW.
    - TU1_GetPeriodTicks -Returns the number of counter ticks before re-initialization. See also method <SetPeriodTicks>. This 
                 method is available only if the property <"Counter restart"> is switched to 'on-match' value.
    - TU1_GetCounterValue -Returns the content of counter register. This method can be used both if counter is enabled and if 
@@ -733,6 +724,8 @@ Module "TU1"       (component TimerUnit_LDD)
                 available when at least one channel is configured.
 
 Module "DIS_PWM"   (component PWM)
+   - DIS_PWM_Enable -This method enables the component - it starts the signal generation. Events may be generated 
+                (<DisableEvent>/<EnableEvent>).
    - DIS_PWM_SetRatio16 -This method sets a new duty-cycle ratio. Ratio is expressed as a 16-bit unsigned integer number. 0 - 
                 FFFF value is proportional to ratio 0 - 100%. The method is available only if it is not selected list of 
                 predefined values in <Starting pulse width> property.   Note: Calculated duty depends on the timer 
@@ -749,6 +742,39 @@ Module "AD1"       (component ADC)
                 16 bits. In addition, the user code dependency on <AD resolution> is eliminated.
    - AD1_Calibrate -This method starts self calibration process. Calibration is typically used to remove the effects of the 
                 gain and offset from a specific reading.
+
+Module "MINI1"     (component minIni)
+   - MINI1_ini_getbool -Return a boolean key.  A true boolean is found if one of the following is matched:     - A string 
+                starting with 'y' or 'Y'     - A string starting with 't' or 'T'     - A string starting with '1'   A false 
+                boolean is found if one of the following is matched:     - A string starting with 'n' or 'N'     - A string 
+                starting with 'f' or 'F'     - A string starting with '0'
+   - MINI1_ini_gets -Return the string for a given section and key.
+   - MINI1_ini_puts -Writes a string value for a given section and key. Method is only enabled if 'Read only' is set to  'no' 
+                in the properties.
+   - MINI1_ini_getl -Return the long integral value for a given section and key.
+   - MINI1_ini_putl -Writes a long integral value for a given section and key. Method is only enabled if 'Read only' is set to  
+                'no' in the properties.
+   - MINI1_ini_getsection -Return the key inside a section
+   - MINI1_ini_getkey -Return the key inside a section
+
+Module "TU2"       (component TimerUnit_LDD)
+   - TU2_Init -Initializes the device. Allocates memory for the device data structure, allocates interrupt vectors and sets 
+                interrupt priority, sets pin routing, sets timing, etc. If the property <"Enable in init. code"> is set to 
+                "yes" value then the device is also enabled (see the description of the <Enable> method). In this case the 
+                <Enable> method is not necessary and needn't to be generated. This method can be called only once. Before the 
+                second call of Init the <Deinit> must be called first.
+   - TU2_Enable -Enables the component - it starts the signal generation. Events may be generated (see SetEventMask). The 
+                method is not available if the counter can't be disabled/enabled by HW.
+   - TU2_GetPeriodTicks -Returns the number of counter ticks before re-initialization. See also method <SetPeriodTicks>. This 
+                method is available only if the property <"Counter restart"> is switched to 'on-match' value.
+   - TU2_GetCounterValue -Returns the content of counter register. This method can be used both if counter is enabled and if 
+                counter is disabled. The method is not available if HW doesn't allow reading of the counter.
+   - TU2_SetOffsetTicks -Sets the new offset value to channel specified by the parameter ChannelIdx. It is user responsibility 
+                to use value below selected period. This method is available when at least one channel is configured.
+   - TU2_GetOffsetTicks -Returns the number of counter ticks to compare match channel specified by the parameter ChannelIdx. 
+                See also method <SetOffsetTicks>. This method is available when at least one channel is configured.
+   - TU2_SelectOutputAction -Sets the type of compare match and counter overflow action on channel output. This method is 
+                available when at least one channel is configured.
 
 Module "Cpu"       (component MKL25Z128LK4)
 

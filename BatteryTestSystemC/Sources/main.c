@@ -50,8 +50,6 @@
 #include "CS1.h"
 #include "SM1.h"
 #include "SMasterLdd1.h"
-#include "CHG_EN.h"
-#include "BitIoLdd3.h"
 #include "CHG_PWM.h"
 #include "PwmLdd1.h"
 #include "TU1.h"
@@ -59,6 +57,9 @@
 #include "PwmLdd2.h"
 #include "AD1.h"
 #include "AdcLdd1.h"
+#include "MINI1.h"
+#include "TU2.h"
+#include "PE_Types.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"

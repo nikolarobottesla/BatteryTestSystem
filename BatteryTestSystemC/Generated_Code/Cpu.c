@@ -8,7 +8,7 @@
 **     Repository  : Kinetis
 **     Datasheet   : KL25P80M48SF0RM, Rev.3, Sep 2012
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-08-08, 07:41, # CodeGen: 6
+**     Date/Time   : 2015-09-10, 22:39, # CodeGen: 24
 **     Abstract    :
 **
 **     Settings    :
@@ -274,8 +274,6 @@
 #include "CS1.h"
 #include "SM1.h"
 #include "SMasterLdd1.h"
-#include "CHG_EN.h"
-#include "BitIoLdd3.h"
 #include "CHG_PWM.h"
 #include "PwmLdd1.h"
 #include "TU1.h"
@@ -283,6 +281,8 @@
 #include "PwmLdd2.h"
 #include "AD1.h"
 #include "AdcLdd1.h"
+#include "MINI1.h"
+#include "TU2.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"
@@ -1079,14 +1079,13 @@ void PE_low_level_init(void)
   (void)SS1_Init(NULL);
   /* ### SD_Card "SD1" init code ... */
   /* ### FAT_FileSystem "FAT1" init code ... */
-  /* ### BitIO_LDD "BitIoLdd3" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
-  (void)BitIoLdd3_Init(NULL);
   /* ### PWM_LDD "PwmLdd1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
   (void)PwmLdd1_Init(NULL);
   /* ### PWM_LDD "PwmLdd2" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
   (void)PwmLdd2_Init(NULL);
   /* ### ADC "AD1" init code ... */
   AD1_Init();
+  /* ### minIni "MINI1" init code ... */
 }
   /* Flash configuration field */
   __attribute__ ((section (".cfmconfig"))) const uint8_t _cfm[0x10] = {

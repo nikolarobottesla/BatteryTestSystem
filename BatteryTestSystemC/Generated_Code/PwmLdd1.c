@@ -7,7 +7,7 @@
 **     Version     : Component 01.014, Driver 01.03, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-08-08, 07:41, # CodeGen: 6
+**     Date/Time   : 2015-09-11, 22:41, # CodeGen: 27
 **     Abstract    :
 **          This component implements a pulse-width modulation generator
 **          that generates signal with variable duty and fixed cycle.
@@ -16,17 +16,17 @@
 **          component.
 **     Settings    :
 **          Component name                                 : PwmLdd1
-**          Period device                                  : TPM0_MOD
-**          Duty device                                    : TPM0_C2V
-**          Output pin                                     : PTC3/LLWU_P7/UART1_RX/TPM0_CH2/CLKOUTa
+**          Period device                                  : TPM2_MOD
+**          Duty device                                    : TPM2_C0V
+**          Output pin                                     : ADC0_SE12/TSI0_CH7/PTB2/I2C0_SCL/TPM2_CH0
 **          Output pin signal                              : CHG_PWM
-**          Counter                                        : TPM0_CNT
+**          Counter                                        : TPM2_CNT
 **          Interrupt service/event                        : Disabled
 **          Period                                         : 100 kHz
 **          Starting pulse width                           : 0 µs
 **          Initial polarity                               : low
 **          Initialization                                 : 
-**            Enabled in init. code                        : yes
+**            Enabled in init. code                        : no
 **            Auto initialization                          : yes
 **            Event mask                                   : 
 **              OnEnd                                      : Disabled
@@ -40,9 +40,10 @@
 **            Clock configuration 6                        : This component disabled
 **            Clock configuration 7                        : This component disabled
 **          Referenced components                          : 
-**            Linked component                             : TU1
+**            Linked component                             : TU2
 **     Contents    :
 **         Init       - LDD_TDeviceData* PwmLdd1_Init(LDD_TUserData *UserDataPtr);
+**         Enable     - LDD_TError PwmLdd1_Enable(LDD_TDeviceData *DeviceDataPtr);
 **         SetRatio16 - LDD_TError PwmLdd1_SetRatio16(LDD_TDeviceData *DeviceDataPtr, uint16_t Ratio);
 **         SetDutyUS  - LDD_TError PwmLdd1_SetDutyUS(LDD_TDeviceData *DeviceDataPtr, uint16_t Time);
 **
@@ -147,11 +148,11 @@ LDD_TDeviceData* PwmLdd1_Init(LDD_TUserData *UserDataPtr)
   /* {FreeRTOS RTOS Adapter} Driver memory allocation: Dynamic allocation is simulated by a pointer to the static object */
   DeviceDataPrv = &DeviceDataPrv__DEFAULT_RTOS_ALLOC;
   DeviceDataPrv->UserDataPtr = UserDataPtr; /* Store the RTOS device structure */
-  DeviceDataPrv->EnUser = TRUE;        /* Set the flag "device enabled" */
+  DeviceDataPrv->EnUser = FALSE;       /* Set the flag "device disabled" */
   DeviceDataPrv->RatioStore = 0x01U;   /* Ratio after initialization */
   /* Registration of the device structure */
   PE_LDD_RegisterDeviceStructure(PE_LDD_COMPONENT_PwmLdd1_ID,DeviceDataPrv);
-  DeviceDataPrv->LinkedDeviceDataPtr = TU1_Init((LDD_TUserData *)NULL);
+  DeviceDataPrv->LinkedDeviceDataPtr = TU2_Init((LDD_TUserData *)NULL);
   if (DeviceDataPrv->LinkedDeviceDataPtr == NULL) { /* Is initialization of TimerUnit unsuccessful? */
     /* Unregistration of the device structure */
     PE_LDD_UnregisterDeviceStructure(PE_LDD_COMPONENT_PwmLdd1_ID);
@@ -160,6 +161,35 @@ LDD_TDeviceData* PwmLdd1_Init(LDD_TUserData *UserDataPtr)
     return NULL;                       /* If so, then the PWM initialization is also unsuccessful */
   }
   return ((LDD_TDeviceData *)DeviceDataPrv); /* Return pointer to the device data structure */
+}
+
+/*
+** ===================================================================
+**     Method      :  PwmLdd1_Enable (component PWM_LDD)
+*/
+/*!
+**     @brief
+**         Enables the component - it starts the signal generation.
+**         Events may be generated (see SetEventMask).
+**     @param
+**         DeviceDataPtr   - Device data structure
+**                           pointer returned by [Init] method.
+**     @return
+**                         - Error code, possible codes:
+**                           ERR_OK - OK
+**                           ERR_SPEED - The component does not work in
+**                           the active clock configuration
+*/
+/* ===================================================================*/
+LDD_TError PwmLdd1_Enable(LDD_TDeviceData *DeviceDataPtr)
+{
+  PwmLdd1_TDeviceData *DeviceDataPrv = (PwmLdd1_TDeviceData *)DeviceDataPtr;
+
+  if (!DeviceDataPrv->EnUser) {        /* Is the device disabled by user? */
+    DeviceDataPrv->EnUser = TRUE;      /* If yes then set the flag "device enabled" */
+    (void)TU2_Enable(DeviceDataPrv->LinkedDeviceDataPtr); /* Enable TimerUnit */
+  }
+  return ERR_OK;
 }
 
 /*
@@ -259,14 +289,14 @@ static void SetRatio(LDD_TDeviceData *DeviceDataPtr)
   uint16_t Period;
   uint16_t Duty;
 
-  (void)TU1_GetPeriodTicks(DeviceDataPrv->LinkedDeviceDataPtr, &Period);
+  (void)TU2_GetPeriodTicks(DeviceDataPrv->LinkedDeviceDataPtr, &Period);
   if (Period == 0U) {
     Duty = DeviceDataPrv->RatioStore;
   }
   else {
     Duty = (uint16_t)((((uint32_t)(Period) * DeviceDataPrv->RatioStore) + 0x8000) >> 0x10);
   }
-  (void)TU1_SetOffsetTicks(DeviceDataPrv->LinkedDeviceDataPtr, CHANNEL, Duty);
+  (void)TU2_SetOffsetTicks(DeviceDataPrv->LinkedDeviceDataPtr, CHANNEL, Duty);
 }
 /* END PwmLdd1. */
 

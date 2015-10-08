@@ -7,7 +7,7 @@
 **     Version     : Component 01.697, Driver 01.00, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-08-12, 20:23, # CodeGen: 7
+**     Date/Time   : 2015-08-27, 18:35, # CodeGen: 19
 **     Abstract    :
 **         This device "ADC" implements an A/D converter,
 **         its control methods and interrupt/event handling procedure.
@@ -43,7 +43,7 @@
 **          Asynchro clock output                          : Disabled
 **          Sample time                                    : 20 = long
 **          Internal trigger                               : Disabled
-**          Number of conversions                          : 8
+**          Number of conversions                          : 128
 **          Initialization                                 : 
 **            Enabled in init. code                        : yes
 **            Events enabled in init.                      : yes

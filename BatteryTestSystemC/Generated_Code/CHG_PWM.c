@@ -7,17 +7,17 @@
 **     Version     : Component 02.241, Driver 01.01, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-08-08, 07:41, # CodeGen: 6
+**     Date/Time   : 2015-09-11, 22:41, # CodeGen: 27
 **     Abstract    :
 **         This component implements a pulse-width modulation generator
 **         that generates signal with variable duty and fixed cycle. 
 **     Settings    :
 **          Component name                                 : CHG_PWM
-**          PWM or PPG device                              : TPM0_C2V
+**          PWM or PPG device                              : TPM2_C0V
 **          Duty compare                                   : 
-**          Output pin                                     : PTC3/LLWU_P7/UART1_RX/TPM0_CH2/CLKOUTa
+**          Output pin                                     : ADC0_SE12/TSI0_CH7/PTB2/I2C0_SCL/TPM2_CH0
 **          Output pin signal                              : CHG_PWM
-**          Counter                                        : TPM0_CNT
+**          Counter                                        : TPM2_CNT
 **          Interrupt service/event                        : Disabled
 **          Period                                         : 100 kHz
 **          Starting pulse width                           : 0 µs
@@ -25,7 +25,7 @@
 **          Same period in modes                           : no
 **          Component uses entire timer                    : no
 **          Initialization                                 : 
-**            Enabled in init. code                        : yes
+**            Enabled in init. code                        : no
 **            Events enabled in init.                      : yes
 **          CPU clock/speed selection                      : 
 **            High speed mode                              : This component enabled
@@ -34,6 +34,7 @@
 **          Referenced components                          : 
 **            PWM_LDD                                      : PWM_LDD
 **     Contents    :
+**         Enable     - byte CHG_PWM_Enable(void);
 **         SetRatio16 - byte CHG_PWM_SetRatio16(word Ratio);
 **         SetDutyUS  - byte CHG_PWM_SetDutyUS(word Time);
 **
@@ -87,6 +88,26 @@
 #ifdef __cplusplus
 extern "C" {
 #endif 
+
+/*
+** ===================================================================
+**     Method      :  CHG_PWM_Enable (component PWM)
+**     Description :
+**         This method enables the component - it starts the signal
+**         generation. Events may be generated (<DisableEvent>
+**         /<EnableEvent>).
+**     Parameters  : None
+**     Returns     :
+**         ---             - Error code, possible codes:
+**                           ERR_OK - OK
+**                           ERR_SPEED - This device does not work in
+**                           the active speed mode
+** ===================================================================
+*/
+/*
+byte CHG_PWM_Enable(void)
+**  This method is implemented as a macro. See CHG_PWM.h file.  **
+*/
 
 /*
 ** ===================================================================

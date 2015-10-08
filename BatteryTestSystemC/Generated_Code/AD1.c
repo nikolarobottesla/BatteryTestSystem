@@ -7,7 +7,7 @@
 **     Version     : Component 01.697, Driver 01.00, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-08-12, 20:23, # CodeGen: 7
+**     Date/Time   : 2015-08-27, 18:35, # CodeGen: 19
 **     Abstract    :
 **         This device "ADC" implements an A/D converter,
 **         its control methods and interrupt/event handling procedure.
@@ -43,7 +43,7 @@
 **          Asynchro clock output                          : Disabled
 **          Sample time                                    : 20 = long
 **          Internal trigger                               : Disabled
-**          Number of conversions                          : 8
+**          Number of conversions                          : 128
 **          Initialization                                 : 
 **            Enabled in init. code                        : yes
 **            Events enabled in init.                      : yes
@@ -246,10 +246,10 @@ byte AD1_GetValue16(word *Values)
   if (!OutFlg) {                       /* Is output flag set? */
     return ERR_NOTAVAIL;               /* If no then error */
   }
-  Values[0] = (word)((word)(AD1_OutV[0] >> 3U)); /* Save measured values to the output buffer */
-  Values[1] = (word)((word)(AD1_OutV[1] >> 3U)); /* Save measured values to the output buffer */
-  Values[2] = (word)((word)(AD1_OutV[2] >> 3U)); /* Save measured values to the output buffer */
-  Values[3] = (word)((word)(AD1_OutV[3] >> 3U)); /* Save measured values to the output buffer */
+  Values[0] = (word)((word)(AD1_OutV[0] >> 7U)); /* Save measured values to the output buffer */
+  Values[1] = (word)((word)(AD1_OutV[1] >> 7U)); /* Save measured values to the output buffer */
+  Values[2] = (word)((word)(AD1_OutV[2] >> 7U)); /* Save measured values to the output buffer */
+  Values[3] = (word)((word)(AD1_OutV[3] >> 7U)); /* Save measured values to the output buffer */
   return ERR_OK;                       /* OK */
 }
 
@@ -325,7 +325,7 @@ void AdcLdd1_OnMeasurementComplete(LDD_TUserData *UserDataPtr)
   if (SumChan == 4U) {                 /* Is number of measured channels equal to the number of channels used in the component? */
     SumChan = 0U;                      /* If yes then set the counter of measured channels to 0 */
     SumCnt++;                          /* Increase counter of conversions*/
-    if (SumCnt == 8U) {                /* Is number of conversions on each channel equal to the number of conversions defined in the component? */
+    if (SumCnt == 128U) {              /* Is number of conversions on each channel equal to the number of conversions defined in the component? */
       OutFlg = TRUE;                   /* Measured values are available */
       AD1_OnEnd();                     /* If yes then invoke user event */
       ModeFlg = STOP;                  /* Set the device to the stop mode */

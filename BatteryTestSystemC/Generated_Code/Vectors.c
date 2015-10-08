@@ -6,7 +6,7 @@
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-08-08, 07:41, # CodeGen: 6
+**     Date/Time   : 2015-09-10, 22:39, # CodeGen: 24
 **     Abstract    :
 **
 **     Settings    :
@@ -75,8 +75,6 @@
   #include "CS1.h"
   #include "SM1.h"
   #include "SMasterLdd1.h"
-  #include "CHG_EN.h"
-  #include "BitIoLdd3.h"
   #include "CHG_PWM.h"
   #include "PwmLdd1.h"
   #include "TU1.h"
@@ -84,6 +82,8 @@
   #include "PwmLdd2.h"
   #include "AD1.h"
   #include "AdcLdd1.h"
+  #include "MINI1.h"
+  #include "TU2.h"
   #include "Events.h"
 
 

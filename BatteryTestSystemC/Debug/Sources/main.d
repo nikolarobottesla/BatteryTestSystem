@@ -67,22 +67,25 @@ Sources/main.o: ../Sources/main.c \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CS1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/SM1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/SMasterLdd1.h \
- C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CHG_EN.h \
- C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/BitIoLdd3.h \
- C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/BitIoLdd3.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CHG_PWM.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PwmLdd1.h \
- C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/TU1.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/TU2.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/PDD/TPM_PDD.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PwmLdd1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/TU1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/DIS_PWM.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PwmLdd2.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/TU1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PwmLdd2.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/AD1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/AdcLdd1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/PDD/ADC_PDD.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/AdcLdd1.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/MINI1.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/FAT1.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/minIni.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/minGlue-FatFs.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/TU2.h \
  ../Sources/Application.h
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/Cpu.h:
@@ -221,17 +224,11 @@ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_C
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/SMasterLdd1.h:
 
-C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CHG_EN.h:
-
-C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/BitIoLdd3.h:
-
-C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/BitIoLdd3.h:
-
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CHG_PWM.h:
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PwmLdd1.h:
 
-C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/TU1.h:
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/TU2.h:
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/PDD/TPM_PDD.h:
 
@@ -243,6 +240,8 @@ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_C
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PwmLdd2.h:
 
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/TU1.h:
+
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PwmLdd2.h:
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/AD1.h:
@@ -252,5 +251,15 @@ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_C
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/PDD/ADC_PDD.h:
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/AdcLdd1.h:
+
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/MINI1.h:
+
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/FAT1.h:
+
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/minIni.h:
+
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/minGlue-FatFs.h:
+
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/TU2.h:
 
 ../Sources/Application.h:

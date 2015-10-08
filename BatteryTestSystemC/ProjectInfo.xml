@@ -56,8 +56,6 @@
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\AdcLdd1.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\BitIoLdd1.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\BitIoLdd2.c</PathName>
-      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\BitIoLdd3.c</PathName>
-      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\CHG_EN.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\CHG_PWM.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\CLS1.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\CS1.c</PathName>
@@ -69,6 +67,7 @@
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\LEDR.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\LEDpin1.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\LEDpin2.c</PathName>
+      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\MINI1.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\PE_LDD.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\PwmLdd1.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\PwmLdd2.c</PathName>
@@ -78,6 +77,7 @@
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\SS1.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\TMOUT1.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\TU1.c</PathName>
+      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\TU2.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\TmDt1.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\UTIL1.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\Vectors.c</PathName>
@@ -91,6 +91,8 @@
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\heap_4.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\heap_5.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\list.c</PathName>
+      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\minGlue-FatFs.c</PathName>
+      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\minIni.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\port.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\queue.c</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\tasks.c</PathName>
@@ -108,8 +110,6 @@
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\AdcLdd1.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\BitIoLdd1.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\BitIoLdd2.h</PathName>
-      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\BitIoLdd3.h</PathName>
-      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\CHG_EN.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\CHG_PWM.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\CLS1.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\CS1.h</PathName>
@@ -124,6 +124,7 @@
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\LEDR.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\LEDpin1.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\LEDpin2.h</PathName>
+      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\MINI1.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\PE_Const.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\PE_Error.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\PE_LDD.h</PathName>
@@ -137,6 +138,7 @@
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\StackMacros.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\TMOUT1.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\TU1.h</PathName>
+      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\TU2.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\TmDt1.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\UTIL1.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\WAIT1.h</PathName>
@@ -148,6 +150,9 @@
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\ffconf.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\integer.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\list.h</PathName>
+      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\minGlue-FatFs.h</PathName>
+      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\minGlue.h</PathName>
+      <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\minIni.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\mpu_wrappers.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\portTicks.h</PathName>
       <PathName>C:\Dark Angel\Documents\GitHub\BatteryTestSystem\BatteryTestSystemC\Generated_Code\portable.h</PathName>

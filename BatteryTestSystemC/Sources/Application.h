@@ -28,6 +28,9 @@ void APP_Run(void);
 #define VTEMP 2
 #define VBAT_SE 3
 
+//define buffer array sizes for data to be written
+#define dataBuffSize 30
+
 //function prototypes
 static void loadSettings(void);//
 static void measureAll(void);
@@ -36,3 +39,4 @@ static void writeData(void);
 static void iteratePID(void);
 static void stop_CHG_DIS(void);        //immediately stops charging or discharging
 static void start_CHG_DIS(void);       //
+

@@ -7,7 +7,7 @@
 **     Version     : Component 01.073, Driver 01.00, CPU db: 3.00.000
 **     Repository  : mcuoneclipse
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-26, 01:31, # CodeGen: 5
+**     Date/Time   : 2015-10-04, 10:11, # CodeGen: 30
 **     Abstract    :
 **
 **     Settings    :
@@ -18,15 +18,15 @@
 **          Silent Mode Prefix                             : #
 **          Blocking Send                                  : Enabled
 **            Wait                                         : WAIT1
-**            Wait Time (ms)                               : 10
-**            RTOS Wait                                    : no
+**            Wait Time (ms)                               : 100
+**            RTOS Wait                                    : yes
 **          Status Colon Pos                               : 13
 **          Help Semicolon Pos                             : 26
 **          Multi Command                                  : Disabled
 **          Utility                                        : UTIL1
 **          Default Serial                                 : Enabled
 **            Console Interface                            : AS1
-**          Semaphore                                      : no
+**          Semaphore                                      : yes
 **          Critical Section                               : CS1
 **          History                                        : no
 **     Contents    :

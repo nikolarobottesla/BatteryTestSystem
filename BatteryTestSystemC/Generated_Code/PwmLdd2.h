@@ -7,7 +7,7 @@
 **     Version     : Component 01.014, Driver 01.03, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-08-08, 07:41, # CodeGen: 6
+**     Date/Time   : 2015-09-11, 22:41, # CodeGen: 27
 **     Abstract    :
 **          This component implements a pulse-width modulation generator
 **          that generates signal with variable duty and fixed cycle.
@@ -26,7 +26,7 @@
 **          Starting pulse width                           : 0 µs
 **          Initial polarity                               : low
 **          Initialization                                 : 
-**            Enabled in init. code                        : yes
+**            Enabled in init. code                        : no
 **            Auto initialization                          : yes
 **            Event mask                                   : 
 **              OnEnd                                      : Disabled
@@ -43,6 +43,7 @@
 **            Linked component                             : TU1
 **     Contents    :
 **         Init       - LDD_TDeviceData* PwmLdd2_Init(LDD_TUserData *UserDataPtr);
+**         Enable     - LDD_TError PwmLdd2_Enable(LDD_TDeviceData *DeviceDataPtr);
 **         SetRatio16 - LDD_TError PwmLdd2_SetRatio16(LDD_TDeviceData *DeviceDataPtr, uint16_t Ratio);
 **         SetDutyUS  - LDD_TError PwmLdd2_SetDutyUS(LDD_TDeviceData *DeviceDataPtr, uint16_t Time);
 **
@@ -124,6 +125,7 @@ extern "C" {
 
 /* Methods configuration constants - generated for all enabled component's methods */
 #define PwmLdd2_Init_METHOD_ENABLED    /*!< Init method of the component PwmLdd2 is enabled (generated) */
+#define PwmLdd2_Enable_METHOD_ENABLED  /*!< Enable method of the component PwmLdd2 is enabled (generated) */
 #define PwmLdd2_SetRatio16_METHOD_ENABLED /*!< SetRatio16 method of the component PwmLdd2 is enabled (generated) */
 #define PwmLdd2_SetDutyUS_METHOD_ENABLED /*!< SetDutyUS method of the component PwmLdd2 is enabled (generated) */
 
@@ -156,6 +158,26 @@ extern "C" {
 */
 /* ===================================================================*/
 LDD_TDeviceData* PwmLdd2_Init(LDD_TUserData *UserDataPtr);
+
+/*
+** ===================================================================
+**     Method      :  PwmLdd2_Enable (component PWM_LDD)
+*/
+/*!
+**     @brief
+**         Enables the component - it starts the signal generation.
+**         Events may be generated (see SetEventMask).
+**     @param
+**         DeviceDataPtr   - Device data structure
+**                           pointer returned by [Init] method.
+**     @return
+**                         - Error code, possible codes:
+**                           ERR_OK - OK
+**                           ERR_SPEED - The component does not work in
+**                           the active clock configuration
+*/
+/* ===================================================================*/
+LDD_TError PwmLdd2_Enable(LDD_TDeviceData *DeviceDataPtr);
 
 /*
 ** ===================================================================

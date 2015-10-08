@@ -1,45 +1,51 @@
 /*
  * Application.c
- *      Author: Erich Styger
+ *      Author: Milo Oien-Rochat
  */
 #include "Application.h"
 #include "LEDR.h"
 #include "LEDG.h"
 #include "FRTOS1.h"
 #include "Shell.h"
-#include "CHG_EN.h"
 #include "CHG_PWM.h"
 #include "DIS_PWM.h"
 #include "AD1.h"
 #include "WAIT1.h"
+#include "CS1.h"
 #include <stdio.h>
 
 /* Global Variales */
 static int state=chgMode;			//used to control the run mode of the system idleMode, intResTest, chgMode, disMode, cycleDone
-static int numCycles = 1;          //number of charge/discharge cycles
-static int startFirst = 0;         //0=charge first, 1=discharge first
-static int errorType=0;            //declare int used to indicate the error type, 0=no error, 1=current too high
+static int numCycles = 1;			//number of charge/discharge cycles
+static int startFirst = 0;			//0=charge first, 1=discharge first
+static int errorType=0;				//declare int used to indicate the error type, 0=no error, 1=current too high
 static int doneReason;				//reason the cycle ended, 1= delta peak, 2= temp limit, 3= time limit, 4= discharge Vcut, 5=cell dropout
-static float currentSet=.005;         //declare float, sets the battery current, in amps, don't set higher than 7
-static float chgCurrSet=0;         //charge current in A
-static float disCurrSet=0;         //discharge current in A
-static float currentLimit=6.5;     //current limit in A
+static float currentSet=0;		//declare float, sets the battery current, in amps, don't set higher than 7
+static float chgCurrSet=0;			//charge current in A
+static float disCurrSet=0;			//discharge current in A
+static float currentLimit=6.5;		//current limit in A
 static float maxCurrSense=11;		//the maximum current the adc can sense
-static float deltaPeak=0.024;      //delta peak charge cutoff voltage in V (6 cells * 4mV)
-static float disVcut=5.4;          //discharge voltage cutoff in V
-static float VBatRateLimit = -.01; //cell dropout rate [V/s]
-static float chgTimeout = 120;     //charge timeout in minutes
-static float disTimeout = 120;     //discharge timeout in minutes
-static TickType_t interval = 1000;			//measurement interval in ms
+static float deltaPeak=0.024;		//delta peak charge cutoff voltage in V (6 cells * 4mV)
+static float disVcut=5.4;			//discharge voltage cutoff in V
+static float VBatRateLimit = -.01;	//cell dropout rate [V/s]
+static float chgTimeout = 120;		//charge timeout in minutes
+static float disTimeout = 120;		//discharge timeout in minutes
+static TickType_t interval = 1000;	//measurement interval in ms
 //static float chgCapLimit = 12000;	//charge capacity limit [mAh]
 //static float disCapLimit = 8000;	//discharge capacity limit [mAh]
 //static float capacity;				//current measured capacity
-static float OTthresh = 50;        //over temperature threshhold in celsius
-static float perCurrent;           //float, stores the battery current read by the ADC, between 0 and 1
-static float current[4];          //float array, the battery current in Amps, saved to usd card
-static float VBat[4];             //float array, stores the battery voltage in Volts, saved to usd card
-static float temp[4];             //float array, stores the temperature sensor reading in Volts
-static int timeStamp[4]={-1};		//stores the time a measurement was made,
+static float OTthresh = 50;        	//over temperature threshhold in celsius
+//PID variables, PID controls /charge or discharge current
+static float PID_Kp = 0.1;             	//Proportional constant
+static float PID_Ki = 0.05;             //Integral constant
+//float Kd = 0.1;             //Derivative constant
+//float prevError = 0;        //previous error value
+//float difError;             //Differential error, difError - err from previous loop'
+static float perCurrent;           	//float, stores the battery current read by the ADC, between 0 and 1
+static float current[dataBuffSize];	//float array, the battery current in Amps, saved to usd card
+static float VBat[dataBuffSize];	//float array, stores the battery voltage in Volts, saved to usd card
+static float temp[dataBuffSize];	//float array, stores the temperature sensor reading in Volts
+static int timeStamp[dataBuffSize]={-1};	//stores the time a measurement was made,
 static int lastStamp;				//stores last loop's timestamp
 static int dp=0;					//data pointer, used to indicate which element is most recent in the measured data arrays
 static int measure_time;			//stores the current measurement iteration for the entire charge or discharge cycle
@@ -51,12 +57,23 @@ static float preVBat;				//stores the previous Vbat measurement
 static float rateVBat;				//the battery voltage rate, used for cell dropout check [volts/sec]
 static float PID_perCurrentSet;		//float, stores the battery current setting scaled between 0 and 1
 static float PID_perCurrentLimit;	//float, stores current limit scaled between 0 and 1
-static float PID_intError;		//integration result from previous loop + error * periodSec
+static float PID_intError;			//integration result from previous loop + error * periodSec
+static unsigned char buffer[64];	//used to store
+static unsigned int accumulator = 65535;	//used for debugging
 
 static portTASK_FUNCTION(R_LEDblink, pvParameters) {
   (void)pvParameters; /* parameter not used */
+
+  buffer[0] = '\0'; /* initialize buffer for ReadLine() */
   for(;;) {
-    LEDR_Neg();
+	CLS1_SendStr("Type in some text with CR or LF at the end...\r\n", CLS1_GetStdio()->stdOut);
+	if (CLS1_ReadLine(buffer, buffer, sizeof(buffer), CLS1_GetStdio())) {
+	  /* line read */
+	  CLS1_SendStr("You entered:\r\n", CLS1_GetStdio()->stdOut);
+	  CLS1_SendStr(buffer, CLS1_GetStdio()->stdOut);
+	  buffer[0] = '\0';
+	}
+    //LEDR_Neg();
     FRTOS1_vTaskDelay(5000/portTICK_RATE_MS);
   }
 }
@@ -64,6 +81,9 @@ static portTASK_FUNCTION(R_LEDblink, pvParameters) {
 static portTASK_FUNCTION(control, pvParameters) {
   (void)pvParameters; /* parameter not used */
 
+  //initialization
+  CHG_PWM_Enable();
+  DIS_PWM_Enable();
   stop_CHG_DIS();
   AD1_Calibrate(1);	//calibrate adc and wait till done
   TickType_t xLastWakeTime= xTaskGetTickCount(); //Declare and init the xLastWakeTime variable with the current time.
@@ -77,22 +97,38 @@ static portTASK_FUNCTION(control, pvParameters) {
 	  }
 
 	  state = chgMode;	//for debugging
-	  CHG_EN_SetVal();	//enable PFETS for debugging
 
 	  while(state >= chgMode){
 
 		  measureAll();
 		  //chkComplete();
+
 		  iteratePID();
 		  //write data
-		  LEDG_Neg();
+		  LEDR_Neg();
 		  lastStamp = timeStamp[dp];	//save the last time stamp for use in the next loop iteration
-		  dp++;							//increment the data array pointer
+
+		  dp++;							//increment pointer for data buffers
+		  if (dp >= dataBuffSize)
+		  {
+			  dp=0;						//reset pointer for data buffers
+		  }
+
+		  //CLS1_SendStr("Type in some text with CR or LF at the end...\r\n", CLS1_GetStdio()->stdOut);
+
 		  FRTOS1_vTaskDelayUntil(&xLastWakeTime, interval/portTICK_RATE_MS);	//using this vs TaskDelay to get a specific period
 	  }
 
 	  FRTOS1_vTaskDelay(5000/portTICK_RATE_MS);
   }
+}
+
+//function to stop charging or discharging, PWMs are active low
+void stop_CHG_DIS(void)
+{
+    CHG_PWM_SetRatio16(0xFFFF);	//turn off CHG PFETs to disconnect 12V
+    DIS_PWM_SetRatio16(0xFFFF); //turn off discharge NFET if not already off to disconect the load from the circuit.
+	state = -1;     			//set state to done
 }
 
 static void loadSettings(void){
@@ -164,14 +200,6 @@ static void chkComplete(void){
 	}
 }
 
-//PID variables
-
-static float PID_Kp = 0.1;             	//Proportional constant
-static float PID_Ki = 0.01;             //Integral constant
-//float Kd = 0.1;             //Derivative constant
-//float prevError = 0;        //previous error value
-//float difError;             //Differential error, difError - err from previous loop'
-
 
 //PID function to
 static void iteratePID(void){
@@ -185,9 +213,9 @@ static void iteratePID(void){
 
 			//read battery current depending on mode
 			if (state==chgMode)			//if in charge mode
-				perCurrent = rawADC[CHG_CURR] / 0xFFFF;
+				perCurrent = rawADC[CHG_CURR] / (float)0xFFFF;
 			else if (state==disMode)	//else if in discharge mode
-				perCurrent = rawADC[DIS_CURR] / 0xFFFF;
+				perCurrent = rawADC[DIS_CURR] / (float)0xFFFF;
 
 			current[dp]	= perCurrent * maxCurrSense;	//convert percent current to A and put in array
 
@@ -201,29 +229,35 @@ static void iteratePID(void){
 			PID_error = PID_perCurrentSet - perCurrent; 				//calculate PID error
 			PID_intError = PID_intError + (PID_error * periodSec);		//calculate integral error
 			PID_output = PID_Kp * PID_error + PID_Ki * PID_intError;	//PWM output value
-			int_PID_out = PID_output * 0xFFFF;							//convert from float to 16 bit integer value
+
+			//if PID is trying to set current to < 0 value, set output to zero
+			if (PID_output < 0)
+			{
+				PID_output = 0;
+			}
+			else if (PID_output > 1)
+			{
+				PID_output =1;
+			}
+
+			int_PID_out = PID_output * 0xFFFF;			//convert from float to 16 bit integer value
+			int_PID_out = 0xFFFF - int_PID_out;			//PWMs are active low, subtract from full scale so PWM acts active high
 
 			/* used for debugging*/
+			//accumulator = accumulator - 100;
+			//int_PID_out = accumulator;
+			//int_PID_out = 65350;
 			//printf("\n\r output=%f, error=%f, intError=%f",
 			//int_PID_out, PID_output, PID_error, PID_intError);
-
-			//set battery current depending on mode
-			if (state==chgMode)			//if in charge mode
-				CHG_PWM_SetRatio16(int_PID_out);//set charge current
-			else if (state==disMode)	//else if in discharge mode
-				DIS_PWM_SetRatio16(int_PID_out);//set discharge current
+			//if(timeStamp[dp] == 5)
+			//{
+				//set battery current depending on mode
+				if (state==chgMode)			//if in charge mode
+					CHG_PWM_SetRatio16(int_PID_out);//set charge current
+				else if (state==disMode)	//else if in discharge mode
+					DIS_PWM_SetRatio16(int_PID_out);//set discharge current
+			//}
 		}
-}
-
-//function to stop charging or discharging
-void stop_CHG_DIS(void)
-{
-    CHG_EN_ClrVal();        	//turn off PFETs, if not already off
-    CHG_PWM_SetRatio16(0xFFFF);	//turn on CHG NFET which connects the negative side of the battery to PGND
-    DIS_PWM_SetRatio16(0);      //turn off discharge NFET if not already off to disconect the load from the circuit.
-    WAIT1_Waitms(1000);        	//wait 1 second to allow capacitors to discharge
-    CHG_PWM_SetRatio16(0);		//turn off CHG NFET to completely disconect battery from circuit
-	state = -1;     //set state to done
 }
 
 void APP_Run(void) {
