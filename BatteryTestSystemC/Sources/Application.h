@@ -1,8 +1,17 @@
 /*
  * Application.h
  *
- *      Author: Erich Styger
+ *      Original Author: Erich Styger
+ *      Heavily Modified by: Milo Oien-Rochat
  */
+
+/* Include shared modules, which are used for whole project */
+#include "PE_Types.h"
+#include "PE_Error.h"
+#include "PE_Const.h"
+#include "IO_Map.h"
+
+#include "CLS1.h"
 
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
@@ -39,4 +48,8 @@ static void writeData(void);
 static void iteratePID(void);
 static void stop_CHG_DIS(void);        //immediately stops charging or discharging
 static void start_CHG_DIS(void);       //
+byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOType *io);
+static uint8_t PrintHelp(const CLS1_StdIOType *io);
+static uint8_t PrintStatus(const CLS1_StdIOType *io);
+
 

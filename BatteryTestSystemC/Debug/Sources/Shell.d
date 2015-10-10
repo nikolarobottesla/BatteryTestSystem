@@ -1,13 +1,18 @@
 Sources/Shell.o: ../Sources/Shell.c ../Sources/Shell.h \
  ../Sources/Application.h \
- C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/FRTOS1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Types.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Error.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Const.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/IO_Map.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/IO_Map/MKL25Z4.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CLS1.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Types.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Error.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Const.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/IO_Map.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/Cpu.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/FRTOS1.h \
+ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CLS1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/UTIL1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/FreeRTOS.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/FreeRTOSConfig.h \
@@ -22,7 +27,6 @@ Sources/Shell.o: ../Sources/Shell.c ../Sources/Shell.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/queue.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/event_groups.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/timers.h \
- C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CLS1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/LEDR.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/LEDpin1.h \
  C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/BitIoLdd1.h \
@@ -51,8 +55,6 @@ Sources/Shell.o: ../Sources/Shell.c ../Sources/Shell.h \
 
 ../Sources/Application.h:
 
-C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/FRTOS1.h:
-
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Types.h:
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Error.h:
@@ -65,7 +67,19 @@ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CLS1.h:
 
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Types.h:
+
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Error.h:
+
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/PE_Const.h:
+
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/IO_Map.h:
+
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/Cpu.h:
+
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/FRTOS1.h:
+
+C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CLS1.h:
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/UTIL1.h:
 
@@ -94,8 +108,6 @@ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_C
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/event_groups.h:
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/timers.h:
-
-C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/CLS1.h:
 
 C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code/LEDR.h:
 

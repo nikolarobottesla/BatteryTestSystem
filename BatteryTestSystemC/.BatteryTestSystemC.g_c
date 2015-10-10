@@ -523,7 +523,7 @@
     </GenFiles>
     <SignalListFile>Documentation\BatteryTestSystemC_SIGNALS.txt</SignalListFile>
     <DestinationCompiler>GNUC</DestinationCompiler>
-    <ProjectModificationStamp>19</ProjectModificationStamp>
+    <ProjectModificationStamp>20</ProjectModificationStamp>
   </Options>
   <CpuID_2>
     <Generated>true</Generated>
@@ -2020,7 +2020,7 @@
     <ExtraFile27>Generated_Code\FreeRTOS.h</ExtraFile27>
     <ExtraFile28>Generated_Code\croutine.c</ExtraFile28>
     <ExtraFile29>Generated_Code\croutine.h</ExtraFile29>
-    <InhrCompID_96>
+    <InhrCompID_98>
       <Generated>false</Generated>
       <GenCompName />
       <GenComponentVersion>??.???</GenComponentVersion>
@@ -2068,7 +2068,7 @@
       <GenSmartUserChangesDetected_Asembl>false</GenSmartUserChangesDetected_Asembl>
       <GenMethodPos>0</GenMethodPos>
       <GenExtraFilesCount>0</GenExtraFilesCount>
-    </InhrCompID_96>
+    </InhrCompID_98>
   </ComponentID_3>
   <ComponentID_8>
     <Generated>true</Generated>
@@ -5124,8 +5124,8 @@
     <GenComponentVersion>01.073</GenComponentVersion>
     <GenDriverVersion>01.00</GenDriverVersion>
     <GenEventModule>Events</GenEventModule>
-    <HeaderAge>1195659635</HeaderAge>
-    <CodeAge>1195659635</CodeAge>
+    <HeaderAge>1196002331</HeaderAge>
+    <CodeAge>1196002331</CodeAge>
     <AsemblAge>-1</AsemblAge>
     <GenNumMethods>29</GenNumMethods>
     <PrintPrompt>true</PrintPrompt>
@@ -5375,218 +5375,218 @@
       <MethodPos29>SendSeparatedStrings</MethodPos29>
       <MethodType>internal_method_declaration</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>114</LineBeg>
-      <LineEnd>114</LineEnd>
+      <LineBeg>110</LineBeg>
+      <LineEnd>110</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos30>SendStr</MethodPos30>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>118</LineBeg>
-      <LineEnd>142</LineEnd>
+      <LineBeg>114</LineBeg>
+      <LineEnd>138</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos31>SendNum32s</MethodPos31>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>143</LineBeg>
-      <LineEnd>162</LineEnd>
+      <LineBeg>139</LineBeg>
+      <LineEnd>158</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos32>SendNum32u</MethodPos32>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>163</LineBeg>
-      <LineEnd>182</LineEnd>
+      <LineBeg>159</LineBeg>
+      <LineEnd>178</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos33>SendNum16s</MethodPos33>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>183</LineBeg>
-      <LineEnd>202</LineEnd>
+      <LineBeg>179</LineBeg>
+      <LineEnd>198</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos34>SendNum16u</MethodPos34>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>203</LineBeg>
-      <LineEnd>222</LineEnd>
+      <LineBeg>199</LineBeg>
+      <LineEnd>218</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos35>SendNum8u</MethodPos35>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>223</LineBeg>
-      <LineEnd>242</LineEnd>
+      <LineBeg>219</LineBeg>
+      <LineEnd>238</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos36>SendNum8s</MethodPos36>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>243</LineBeg>
-      <LineEnd>262</LineEnd>
+      <LineBeg>239</LineBeg>
+      <LineEnd>258</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos37>ParseCommand</MethodPos37>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>263</LineBeg>
-      <LineEnd>303</LineEnd>
+      <LineBeg>259</LineBeg>
+      <LineEnd>299</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos38>PrintPrompt</MethodPos38>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>304</LineBeg>
-      <LineEnd>319</LineEnd>
+      <LineBeg>300</LineBeg>
+      <LineEnd>315</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos39>IsHistoryCharacter</MethodPos39>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>320</LineBeg>
-      <LineEnd>375</LineEnd>
+      <LineBeg>316</LineBeg>
+      <LineEnd>371</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos40>ReadLine</MethodPos40>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>376</LineBeg>
-      <LineEnd>503</LineEnd>
+      <LineBeg>372</LineBeg>
+      <LineEnd>499</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos41>PrintStatus</MethodPos41>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>504</LineBeg>
-      <LineEnd>529</LineEnd>
+      <LineBeg>500</LineBeg>
+      <LineEnd>525</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos42>PrintCommandFailed</MethodPos42>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>530</LineBeg>
-      <LineEnd>551</LineEnd>
+      <LineBeg>526</LineBeg>
+      <LineEnd>547</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos43>IterateTable</MethodPos43>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>552</LineBeg>
-      <LineEnd>588</LineEnd>
+      <LineBeg>548</LineBeg>
+      <LineEnd>584</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos44>ParseWithCommandTable</MethodPos44>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>589</LineBeg>
-      <LineEnd>684</LineEnd>
+      <LineBeg>585</LineBeg>
+      <LineEnd>680</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos45>SetStdio</MethodPos45>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>685</LineBeg>
-      <LineEnd>702</LineEnd>
+      <LineBeg>681</LineBeg>
+      <LineEnd>698</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos46>GetStdio</MethodPos46>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>703</LineBeg>
-      <LineEnd>718</LineEnd>
+      <LineBeg>699</LineBeg>
+      <LineEnd>714</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos47>ReadAndParseWithCommandTable</MethodPos47>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>719</LineBeg>
-      <LineEnd>771</LineEnd>
+      <LineBeg>715</LineBeg>
+      <LineEnd>767</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos48>RequestSerial</MethodPos48>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>772</LineBeg>
-      <LineEnd>787</LineEnd>
+      <LineBeg>768</LineBeg>
+      <LineEnd>782</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos49>ReleaseSerial</MethodPos49>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>788</LineBeg>
-      <LineEnd>803</LineEnd>
+      <LineBeg>783</LineBeg>
+      <LineEnd>797</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos50>GetSemaphore</MethodPos50>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>804</LineBeg>
-      <LineEnd>819</LineEnd>
+      <LineBeg>798</LineBeg>
+      <LineEnd>813</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos51>SendSeparatedStrings</MethodPos51>
       <MethodType>internal_method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>820</LineBeg>
-      <LineEnd>848</LineEnd>
+      <LineBeg>814</LineBeg>
+      <LineEnd>842</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos52>SendHelpStr</MethodPos52>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>849</LineBeg>
-      <LineEnd>868</LineEnd>
+      <LineBeg>843</LineBeg>
+      <LineEnd>862</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos53>SendStatusStr</MethodPos53>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>869</LineBeg>
-      <LineEnd>888</LineEnd>
+      <LineBeg>863</LineBeg>
+      <LineEnd>882</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos54>ReadChar</MethodPos54>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>889</LineBeg>
-      <LineEnd>913</LineEnd>
+      <LineBeg>883</LineBeg>
+      <LineEnd>905</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos55>SendChar</MethodPos55>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>914</LineBeg>
-      <LineEnd>938</LineEnd>
+      <LineBeg>906</LineBeg>
+      <LineEnd>928</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos56>KeyPressed</MethodPos56>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>939</LineBeg>
-      <LineEnd>959</LineEnd>
+      <LineBeg>929</LineBeg>
+      <LineEnd>947</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos57>Init</MethodPos57>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>960</LineBeg>
-      <LineEnd>998</LineEnd>
+      <LineBeg>948</LineBeg>
+      <LineEnd>971</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos58>Deinit</MethodPos58>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>999</LineBeg>
-      <LineEnd>1015</LineEnd>
+      <LineBeg>972</LineBeg>
+      <LineEnd>985</LineEnd>
     </MethodPos>
     <MethodPos>
       <MethodPos59>SendData</MethodPos59>
       <MethodType>method</MethodType>
       <ModuleType>Code</ModuleType>
-      <LineBeg>1016</LineBeg>
-      <LineEnd>1043</LineEnd>
+      <LineBeg>986</LineBeg>
+      <LineEnd>1013</LineEnd>
     </MethodPos>
     <GenExtraFilesCount>0</GenExtraFilesCount>
   </ComponentID_23>

@@ -9,8 +9,7 @@ Generated_Code/CLS1.o: ../Generated_Code/CLS1.c ../Generated_Code/CLS1.h \
  ../Generated_Code/mpu_wrappers.h ../Generated_Code/task.h \
  ../Generated_Code/list.h ../Generated_Code/UTIL1.h \
  ../Generated_Code/AS1.h ../Generated_Code/ASerialLdd1.h \
- ../Generated_Code/CS1.h ../Generated_Code/semphr.h \
- ../Generated_Code/queue.h
+ ../Generated_Code/CS1.h
 
 ../Generated_Code/CLS1.h:
 
@@ -53,7 +52,3 @@ C:/Dark\ Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code
 ../Generated_Code/ASerialLdd1.h:
 
 ../Generated_Code/CS1.h:
-
-../Generated_Code/semphr.h:
-
-../Generated_Code/queue.h:

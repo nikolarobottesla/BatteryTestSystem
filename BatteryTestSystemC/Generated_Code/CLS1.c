@@ -7,7 +7,7 @@
 **     Version     : Component 01.073, Driver 01.00, CPU db: 3.00.000
 **     Repository  : mcuoneclipse
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-10-04, 10:11, # CodeGen: 30
+**     Date/Time   : 2015-10-09, 17:32, # CodeGen: 31
 **     Abstract    :
 **
 **     Settings    :
@@ -26,7 +26,7 @@
 **          Utility                                        : UTIL1
 **          Default Serial                                 : Enabled
 **            Console Interface                            : AS1
-**          Semaphore                                      : yes
+**          Semaphore                                      : no
 **          Critical Section                               : CS1
 **          History                                        : no
 **     Contents    :
@@ -95,13 +95,9 @@
   static uint8_t CLS1_history_index = 0; /* Selected command */
 #endif
 
-#include "FreeRTOS.h"
-#include "semphr.h"
-
 #ifdef __HC08__
   #pragma MESSAGE DISABLE C3303 /* implicit concatenation of strings */
 #endif
-static xSemaphoreHandle ShellSem = NULL; /* Semaphore to protect shell SCI access */
 
 static CLS1_ConstStdIOType CLS1_stdio =
 {
@@ -783,7 +779,6 @@ uint8_t CLS1_ReadAndParseWithCommandTable(uint8_t *cmdBuf, size_t cmdBufSize, CL
 */
 void CLS1_RequestSerial(void)
 {
-  (void)xSemaphoreTakeRecursive(ShellSem, portMAX_DELAY);
 }
 
 /*
@@ -799,7 +794,6 @@ void CLS1_RequestSerial(void)
 */
 void CLS1_ReleaseSerial(void)
 {
-  (void)xSemaphoreGiveRecursive(ShellSem);
 }
 
 /*
@@ -815,7 +809,7 @@ void CLS1_ReleaseSerial(void)
 */
 void* CLS1_GetSemaphore(void)
 {
-  return ShellSem;
+  return NULL;
 }
 
 /*
@@ -903,13 +897,11 @@ void CLS1_ReadChar(uint8_t *c)
 {
   uint8_t res;
 
-  (void)xSemaphoreTakeRecursive(ShellSem, portMAX_DELAY);
   res = AS1_RecvChar((uint8_t*)c);
   if (res==ERR_RXEMPTY) {
     /* no character in buffer */
     *c = '\0';
   }
-  (void)xSemaphoreGiveRecursive(ShellSem);
 }
 
 /*
@@ -927,14 +919,12 @@ void CLS1_SendChar(uint8_t ch)
 {
   uint8_t res;
 
-  (void)xSemaphoreTakeRecursive(ShellSem, portMAX_DELAY);
   do {
     res = AS1_SendChar((uint8_t)ch);   /* Send char */
     if (res==ERR_TXFULL) {
       WAIT1_WaitOSms(100);
     }
   } while(res==ERR_TXFULL);
-  (void)xSemaphoreGiveRecursive(ShellSem);
 }
 
 /*
@@ -952,9 +942,7 @@ bool CLS1_KeyPressed(void)
 {
   bool res;
 
-  (void)xSemaphoreTakeRecursive(ShellSem, portMAX_DELAY);
   res = (bool)((AS1_GetCharsInRxBuf()==0U) ? FALSE : TRUE); /* true if there are characters in receive buffer */
-  (void)xSemaphoreGiveRecursive(ShellSem);
   return res;
 }
 
@@ -970,21 +958,6 @@ bool CLS1_KeyPressed(void)
 */
 void CLS1_Init(void)
 {
-  bool schedulerStarted;
-  CS1_CriticalVariable();
-
-  schedulerStarted = (bool)(xTaskGetSchedulerState()!=taskSCHEDULER_NOT_STARTED);
-  if (!schedulerStarted) { /* FreeRTOS not started yet. We are called in PE_low_level_init(), and interrupts are disabled */
-    CS1_EnterCritical();
-  }
-  ShellSem = xSemaphoreCreateRecursiveMutex();
-  if (!schedulerStarted) { /* above RTOS call might have enabled interrupts! Make sure we restore the state */
-    CS1_ExitCritical();
-  }
-  if (ShellSem==NULL) { /* semaphore creation failed */
-    for(;;) {} /* error, not enough memory? */
-  }
-  vQueueAddToRegistry(ShellSem, "CLS1_Sem");
 #if CLS1_HISTORY_ENABLED
   {
     int i;
@@ -1009,9 +982,6 @@ void CLS1_Init(void)
 */
 void CLS1_Deinit(void)
 {
-  vQueueUnregisterQueue(ShellSem);
-  vSemaphoreDelete(ShellSem);
-  ShellSem = NULL;
 }
 
 /*

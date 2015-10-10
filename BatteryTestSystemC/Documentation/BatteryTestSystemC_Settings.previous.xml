@@ -954,7 +954,7 @@ PE_DEBUGHALT();
       <boolgroup name="Default Serial" v="Enabled">
         <Console_Interface v="AS1" />
       </boolgroup>
-      <Semaphore v="no" />
+      <Semaphore v="yes" />
       <Critical_Section v="CS1" />
       <boolgroup name="History" v="no" />
     </Properties>

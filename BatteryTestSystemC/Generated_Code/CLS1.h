@@ -7,7 +7,7 @@
 **     Version     : Component 01.073, Driver 01.00, CPU db: 3.00.000
 **     Repository  : mcuoneclipse
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-10-04, 10:11, # CodeGen: 30
+**     Date/Time   : 2015-10-09, 17:32, # CodeGen: 31
 **     Abstract    :
 **
 **     Settings    :
@@ -26,7 +26,7 @@
 **          Utility                                        : UTIL1
 **          Default Serial                                 : Enabled
 **            Console Interface                            : AS1
-**          Semaphore                                      : yes
+**          Semaphore                                      : no
 **          Critical Section                               : CS1
 **          History                                        : no
 **     Contents    :

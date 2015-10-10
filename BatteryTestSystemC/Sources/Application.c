@@ -12,11 +12,10 @@
 #include "AD1.h"
 #include "WAIT1.h"
 #include "CS1.h"
-#include <stdio.h>
 
 /* Global Variales */
-static int state=chgMode;			//used to control the run mode of the system idleMode, intResTest, chgMode, disMode, cycleDone
-static int numCycles = 1;			//number of charge/discharge cycles
+static int state=chgMode;		//used to control the run mode of the system idleMode, intResTest, chgMode, disMode, cycleDone
+static int maxCycles = 1;			//number of charge/discharge cycles
 static int startFirst = 0;			//0=charge first, 1=discharge first
 static int errorType=0;				//declare int used to indicate the error type, 0=no error, 1=current too high
 static int doneReason;				//reason the cycle ended, 1= delta peak, 2= temp limit, 3= time limit, 4= discharge Vcut, 5=cell dropout
@@ -58,21 +57,13 @@ static float rateVBat;				//the battery voltage rate, used for cell dropout chec
 static float PID_perCurrentSet;		//float, stores the battery current setting scaled between 0 and 1
 static float PID_perCurrentLimit;	//float, stores current limit scaled between 0 and 1
 static float PID_intError;			//integration result from previous loop + error * periodSec
-static unsigned char buffer[64];	//used to store
 static unsigned int accumulator = 65535;	//used for debugging
+static char charBuff[64];				//buffer used for io
 
 static portTASK_FUNCTION(R_LEDblink, pvParameters) {
   (void)pvParameters; /* parameter not used */
 
-  buffer[0] = '\0'; /* initialize buffer for ReadLine() */
   for(;;) {
-	CLS1_SendStr("Type in some text with CR or LF at the end...\r\n", CLS1_GetStdio()->stdOut);
-	if (CLS1_ReadLine(buffer, buffer, sizeof(buffer), CLS1_GetStdio())) {
-	  /* line read */
-	  CLS1_SendStr("You entered:\r\n", CLS1_GetStdio()->stdOut);
-	  CLS1_SendStr(buffer, CLS1_GetStdio()->stdOut);
-	  buffer[0] = '\0';
-	}
     //LEDR_Neg();
     FRTOS1_vTaskDelay(5000/portTICK_RATE_MS);
   }
@@ -288,3 +279,90 @@ void APP_Run(void) {
     }
   FRTOS1_vTaskStartScheduler();
 }
+
+
+/*
+** ===================================================================
+**     Method      :  BTS_ParseCommand
+**     Description :
+**         Shell Command Line parser for the Battery Test System. This
+**         lists the commands recognized by the BTS.
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**       * cmd             - Pointer to command string
+**       * handled         - Pointer to variable which tells if
+**                           the command has been handled or not
+**       * io              - Pointer to I/O structure
+**     Returns     :
+**         ---             - Error code
+** ===================================================================
+*/
+byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOType *io)
+{
+  if (UTIL1_strcmp((char*)cmd, "BTS help")==0) {
+    *handled = TRUE;
+    return PrintHelp(io);
+  } else if (UTIL1_strcmp((char*)cmd, "BTS status")==0) {
+    *handled = TRUE;
+    return PrintStatus(io);
+  } /*else if (UTIL1_strncmp((char*)cmd, "FAT1 cd", sizeof("FAT1 cd")-1)==0) {
+    *handled = TRUE;
+    return CdCmd(cmd+sizeof("FAT1"), io);
+  } else if (UTIL1_strncmp((char*)cmd, "FAT1 dir", sizeof("FAT1 dir")-1)==0) {
+    *handled = TRUE;
+    return DirCmd(cmd+sizeof("FAT1"), io);
+  } else if (UTIL1_strncmp((char*)cmd, "FAT1 copy", sizeof("FAT1 copy")-1)==0) {
+    *handled = TRUE;
+    return CopyCmd(cmd+sizeof("FAT1"), io);
+  } else if (UTIL1_strncmp((char*)cmd, "FAT1 delete", sizeof("FAT1 delete")-1)==0) {
+    *handled = TRUE;
+    return DeleteCmd(cmd+sizeof("FAT1"), io);
+  } else if (UTIL1_strncmp((char*)cmd, "FAT1 mkdir", sizeof("FAT1 mkdir")-1)==0) {
+    *handled = TRUE;
+    return MkdirCmd(cmd+sizeof("FAT1"), io);
+  } else if (UTIL1_strncmp((char*)cmd, "FAT1 rename", sizeof("FAT1 rename")-1)==0) {
+    *handled = TRUE;
+    return RenameCmd(cmd+sizeof("FAT1"), io);
+  } else if (UTIL1_strncmp((char*)cmd, "FAT1 print", sizeof("FAT1 print")-1)==0) {
+    *handled = TRUE;
+    return PrintCmd(cmd+sizeof("FAT1"), io);
+  } else if (UTIL1_strcmp((char*)cmd, "FAT1 diskinfo")==0) {
+    *handled = TRUE;
+    return FAT1_PrintDiskInfo(0, io);
+  } else if (UTIL1_strncmp((char*)cmd, "FAT1 sector", sizeof("FAT1 sector")-1)==0) {
+    *handled = TRUE;
+    return SectorCmd(cmd+sizeof("FAT1"), io);
+  } else if (UTIL1_strcmp((char*)cmd, "FAT1 benchmark")==0) {
+    *handled = TRUE;
+    return FAT1_Benchmark(io);
+  }*/
+  return ERR_OK;
+}
+
+//used by BTS_ParseCommand to print help message
+static uint8_t PrintHelp(const CLS1_StdIOType *io) {
+  CLS1_SendHelpStr((unsigned char*)"BTS", (unsigned char*)"Group of BTS commands\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  help|status", (unsigned char*)"Print help or status information\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  chgi <current>", (const unsigned char*)"Set the charge current in Amps\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  disi <current>", (const unsigned char*)"Set the discharge current in Amps\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  serial <pack serial>", (const unsigned char*)"Set pack serial\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  subpack <subpack code>", (const unsigned char*)"set subpack code\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  start", (const unsigned char*)"start battery capacity test\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  stop", (const unsigned char*)"stop test and save data\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  break", (const unsigned char*)"stop test and discard data\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  verbose", (const unsigned char*)"print log to shell\r\n", io->stdOut);
+  return ERR_OK;
+}
+
+//used by BTS_ParseCommand to print status message
+static uint8_t PrintStatus(const CLS1_StdIOType *io) {
+	int currentmA = (int)current[dp] * 1000;
+	CLS1_SendStatusStr((unsigned char*)"BTS", (unsigned char*)"\r\n", io->stdOut);
+	UTIL1_Num32sToStr(charBuff,64,state);
+	CLS1_SendStatusStr((unsigned char*)"  mode", charBuff, io->stdOut);
+	UTIL1_Num32sToStr(charBuff,64,currentmA);
+	CLS1_SendStatusStr((unsigned char*)"  current", charBuff, io->stdOut);
+	CLS1_SendStr((unsigned char*)"\r\n", io->stdOut);
+	return ERR_OK;
+}
+
