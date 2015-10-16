@@ -63,16 +63,16 @@
       <File Name="Documentation/doxygen/pex.doxyfile" FileDate="2015-07-25, 03:09:28" FileAge="1437818968835" FileType="45637" CompNumb="2" />
       <File Name="Generated_Code/BitIoLdd2.h" FileDate="2015-07-25, 03:31:43" FileAge="1437820303358" FileType="45637" CompNumb="85" />
       <File Name="Generated_Code/BitIoLdd2.c" FileDate="2015-07-25, 03:31:43" FileAge="1437820303354" FileType="45637" CompNumb="85" />
-      <File Name="Documentation/BatteryTestSystemC_SIGNALS.txt" FileDate="2015-10-09, 17:32:55" FileAge="1444437175451" FileType="3072" />
+      <File Name="Documentation/BatteryTestSystemC_SIGNALS.txt" FileDate="2015-10-16, 06:36:42" FileAge="1445002602872" FileType="3072" />
       <File Name="Generated_Code/minGlue.h" FileDate="2015-08-30, 10:10:10" FileAge="1440954610547" FileType="45637" CompNumb="79" />
       <File Name="Generated_Code/queue.h" FileDate="2015-07-25, 03:31:43" FileAge="1437820303454" FileType="45637" CompNumb="3" />
-      <File Name="Generated_Code/LEDR.h" FileDate="2015-07-25, 23:31:59" FileAge="1437892319337" FileType="45637" CompNumb="8" />
+      <File Name="Generated_Code/LEDR.h" FileDate="2015-10-14, 20:35:14" FileAge="1444880114483" FileType="45637" CompNumb="8" />
       <File Name="Generated_Code/Cpu.h" FileDate="2015-08-08, 05:42:07" FileAge="1439037727474" FileType="45637" CompNumb="2" />
       <File Name="Static_Code/PDD/PDD_Types.h" FileDate="2015-07-25, 03:09:28" FileAge="1437818968743" FileType="1048576" CompNumb="2" />
       <File Name="Static_Code/PDD/COP_PDD.h" FileDate="2015-07-25, 03:09:28" FileAge="1437818968750" FileType="1048576" />
       <File Name="Generated_Code/queue.c" FileDate="2015-07-25, 03:31:43" FileAge="1437820303450" FileType="45637" CompNumb="3" />
       <File Name="Generated_Code/task.h" FileDate="2015-07-25, 03:31:43" FileAge="1437820303465" FileType="45637" CompNumb="3" />
-      <File Name="Generated_Code/LEDR.c" FileDate="2015-07-25, 23:31:59" FileAge="1437892319331" FileType="45637" CompNumb="8" />
+      <File Name="Generated_Code/LEDR.c" FileDate="2015-10-14, 20:35:14" FileAge="1444880114532" FileType="45637" CompNumb="8" />
       <File Name="Generated_Code/UTIL1.h" FileDate="2015-07-25, 23:31:59" FileAge="1437892319507" FileType="45637" CompNumb="20" />
       <File Name="Generated_Code/Cpu.c" FileDate="2015-09-10, 20:39:30" FileAge="1441942770193" FileType="45637" CompNumb="2" />
       <File Name="Generated_Code/PE_LDD.h" FileDate="2015-09-10, 20:39:30" FileAge="1441942770213" FileType="45637" CompNumb="2" />
@@ -86,7 +86,7 @@
       <File Name="Documentation/doxygen/BatteryTestSystemC_project.txt" FileDate="2015-09-10, 20:39:30" FileAge="1441942770200" FileType="45637" CompNumb="2" />
       <File Name="Static_Code/PDD/PORT_PDD.h" FileDate="2015-07-25, 03:09:28" FileAge="1437818968784" FileType="1048576" />
       <File Name="Generated_Code/portTicks.h" FileDate="2015-07-25, 03:31:43" FileAge="1437820303429" FileType="45637" CompNumb="3" />
-      <File Name="Documentation/BatteryTestSystemC.txt" FileDate="2015-09-11, 20:41:29" FileAge="1442029289609" FileType="3072" />
+      <File Name="Documentation/BatteryTestSystemC.txt" FileDate="2015-10-14, 20:35:16" FileAge="1444880116106" FileType="3072" />
       <File Name="Generated_Code/PwmLdd2.h" FileDate="2015-09-11, 20:41:28" FileAge="1442029288217" FileType="45637" CompNumb="62" />
       <File Name="Generated_Code/ASerialLdd1.h" FileDate="2015-07-25, 03:31:43" FileAge="1437820303524" FileType="45637" CompNumb="22" />
       <File Name="Generated_Code/PwmLdd2.c" FileDate="2015-09-11, 20:41:28" FileAge="1442029288224" FileType="45637" CompNumb="62" />
@@ -133,7 +133,7 @@
       <File Name="Generated_Code/MINI1.h" FileDate="2015-08-30, 10:10:10" FileAge="1440954610569" FileType="45637" CompNumb="79" />
       <File Name="Generated_Code/FreeRTOSConfig.h" FileDate="2015-07-25, 03:31:43" FileAge="1437820303397" FileType="45637" CompNumb="3" />
       <File Name="Generated_Code/MINI1.c" FileDate="2015-08-30, 10:10:10" FileAge="1440954610566" FileType="45637" CompNumb="79" />
-      <File Name="Documentation/BatteryTestSystemC_Settings.xml" FileDate="2015-10-09, 17:32:55" FileAge="1444437175883" FileType="3072" />
+      <File Name="Documentation/BatteryTestSystemC_Settings.xml" FileDate="2015-10-14, 20:35:15" FileAge="1444880115169" FileType="3072" />
       <File Name="Static_Code/PDD/ADC_PDD.h" FileDate="2015-07-25, 03:09:28" FileAge="1437818968745" FileType="1048576" />
       <File Name="Documentation/doxygen/PwmLdd1_component.txt" FileDate="2015-09-11, 20:41:28" FileAge="1442029288161" FileType="45637" CompNumb="58" />
       <File Name="Generated_Code/portable.h" FileDate="2015-07-25, 03:31:43" FileAge="1437820303433" FileType="45637" CompNumb="3" />
@@ -182,5 +182,5 @@
       <File Name="Generated_Code/LEDG.c" FileDate="2015-07-25, 23:31:59" FileAge="1437892319314" FileType="45637" CompNumb="11" />
     </GeneratedByPE>
   </GeneratedFilesList>
-  <CodeGenReference>32</CodeGenReference>
+  <CodeGenReference>35</CodeGenReference>
 </CodeGenerationInfo>

@@ -380,7 +380,10 @@ PE_DEBUGHALT();
         </boolgroup>
         <boolgroup name="PWM" v="Disabled" />
       </group>
-      <boolgroup name="Shell" v="Disabled" />
+      <boolgroup name="Shell" v="Enabled">
+        <Shell v="CLS1" />
+        <Utility v="UTIL1" />
+      </boolgroup>
     </Properties>
     <Methods>
       <Init v="generate code" />
@@ -391,7 +394,7 @@ PE_DEBUGHALT();
       <Get v="generate code" />
       <Put v="generate code" />
       <SetRatio16 v="generate code" />
-      <ParseCommand v="don&amp;apos;t generate code" />
+      <ParseCommand v="generate code" />
     </Methods>
     <Events>
       <EmptySection_DummyValue />
@@ -954,7 +957,7 @@ PE_DEBUGHALT();
       <boolgroup name="Default Serial" v="Enabled">
         <Console_Interface v="AS1" />
       </boolgroup>
-      <Semaphore v="yes" />
+      <Semaphore v="no" />
       <Critical_Section v="CS1" />
       <boolgroup name="History" v="no" />
     </Properties>

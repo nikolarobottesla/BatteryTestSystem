@@ -523,7 +523,7 @@
     </GenFiles>
     <SignalListFile>Documentation\BatteryTestSystemC_SIGNALS.txt</SignalListFile>
     <DestinationCompiler>GNUC</DestinationCompiler>
-    <ProjectModificationStamp>20</ProjectModificationStamp>
+    <ProjectModificationStamp>22</ProjectModificationStamp>
   </Options>
   <CpuID_2>
     <Generated>true</Generated>
@@ -2020,7 +2020,7 @@
     <ExtraFile27>Generated_Code\FreeRTOS.h</ExtraFile27>
     <ExtraFile28>Generated_Code\croutine.c</ExtraFile28>
     <ExtraFile29>Generated_Code\croutine.h</ExtraFile29>
-    <InhrCompID_98>
+    <InhrCompID_104>
       <Generated>false</Generated>
       <GenCompName />
       <GenComponentVersion>??.???</GenComponentVersion>
@@ -2068,7 +2068,7 @@
       <GenSmartUserChangesDetected_Asembl>false</GenSmartUserChangesDetected_Asembl>
       <GenMethodPos>0</GenMethodPos>
       <GenExtraFilesCount>0</GenExtraFilesCount>
-    </InhrCompID_98>
+    </InhrCompID_104>
   </ComponentID_3>
   <ComponentID_8>
     <Generated>true</Generated>
@@ -2076,8 +2076,8 @@
     <GenComponentVersion>01.063</GenComponentVersion>
     <GenDriverVersion>01.00</GenDriverVersion>
     <GenEventModule />
-    <HeaderAge>1190771709</HeaderAge>
-    <CodeAge>1190771709</CodeAge>
+    <HeaderAge>1196336231</HeaderAge>
+    <CodeAge>1196336231</CodeAge>
     <AsemblAge>-1</AsemblAge>
     <GenNumMethods>9</GenNumMethods>
     <Init>true</Init>
@@ -2392,6 +2392,88 @@
         <ExtraFile0>Documentation\doxygen\BitIoLdd1_component.txt</ExtraFile0>
       </InhrCompID_83>
     </InhrCompID_82>
+    <InhrCompID_100>
+      <Generated>false</Generated>
+      <GenCompName />
+      <GenComponentVersion>??.???</GenComponentVersion>
+      <GenDriverVersion>??.??</GenDriverVersion>
+      <GenEventModule />
+      <HeaderAge>-1</HeaderAge>
+      <CodeAge>-1</CodeAge>
+      <AsemblAge>-1</AsemblAge>
+      <GenNumMethods>18</GenNumMethods>
+      <Enable>false</Enable>
+      <Disable>false</Disable>
+      <EnableEvent>false</EnableEvent>
+      <DisableEvent>false</DisableEvent>
+      <SetRatio8>false</SetRatio8>
+      <SetRatio16>false</SetRatio16>
+      <SetDutyTicks16>false</SetDutyTicks16>
+      <SetDutyTicks32>false</SetDutyTicks32>
+      <SetDutyUS>false</SetDutyUS>
+      <SetDutyMS>false</SetDutyMS>
+      <SetDutySec>false</SetDutySec>
+      <SetDutyReal>false</SetDutyReal>
+      <MaximumDuty>false</MaximumDuty>
+      <SetDutyMode>false</SetDutyMode>
+      <SetValue>false</SetValue>
+      <ClrValue>false</ClrValue>
+      <ConnectPin>false</ConnectPin>
+      <ConnectPin>false</ConnectPin>
+      <GenNumEvents>3</GenNumEvents>
+      <BeforeNewSpeed_Selected>1</BeforeNewSpeed_Selected>
+      <BeforeNewSpeed_Name>PWM1_BeforeNewSpeed</BeforeNewSpeed_Name>
+      <BeforeNewSpeed_Priority>interrupts disabled</BeforeNewSpeed_Priority>
+      <AfterNewSpeed_Selected>1</AfterNewSpeed_Selected>
+      <AfterNewSpeed_Name>PWM1_AfterNewSpeed</AfterNewSpeed_Name>
+      <AfterNewSpeed_Priority>interrupts disabled</AfterNewSpeed_Priority>
+      <OnEnd_Selected>1</OnEnd_Selected>
+      <OnEnd_Name>PWM1_OnEnd</OnEnd_Name>
+      <OnEnd_Priority>same as interrupt</OnEnd_Priority>
+      <GenSmartUserChangesDetected_Header>false</GenSmartUserChangesDetected_Header>
+      <GenSmartUserChangesDetected_Code>false</GenSmartUserChangesDetected_Code>
+      <GenSmartUserChangesDetected_Asembl>false</GenSmartUserChangesDetected_Asembl>
+      <GenMethodPos>0</GenMethodPos>
+      <GenExtraFilesCount>0</GenExtraFilesCount>
+      <InhrCompID_101>
+        <Generated>false</Generated>
+        <GenCompName />
+        <GenComponentVersion>??.???</GenComponentVersion>
+        <GenDriverVersion>??.??</GenDriverVersion>
+        <GenEventModule />
+        <HeaderAge>-1</HeaderAge>
+        <CodeAge>-1</CodeAge>
+        <AsemblAge>-1</AsemblAge>
+        <GenNumMethods>18</GenNumMethods>
+        <Init>false</Init>
+        <Deinit>false</Deinit>
+        <Enable>false</Enable>
+        <Disable>false</Disable>
+        <SetEventMask>false</SetEventMask>
+        <GetEventMask>false</GetEventMask>
+        <GetEventStatus>false</GetEventStatus>
+        <SetRatio8>false</SetRatio8>
+        <SetRatio16>false</SetRatio16>
+        <SetDutyUS>false</SetDutyUS>
+        <SetDutyMS>false</SetDutyMS>
+        <SetDutySec>false</SetDutySec>
+        <SetDutyReal>false</SetDutyReal>
+        <SetValue>false</SetValue>
+        <ClearValue>false</ClearValue>
+        <ConnectPin>false</ConnectPin>
+        <SetOperationMode>false</SetOperationMode>
+        <GetDriverState>false</GetDriverState>
+        <GenNumEvents>1</GenNumEvents>
+        <OnEnd_Selected>1</OnEnd_Selected>
+        <OnEnd_Name>PWM1_OnEnd</OnEnd_Name>
+        <OnEnd_Priority>interrupts disabled</OnEnd_Priority>
+        <GenSmartUserChangesDetected_Header>false</GenSmartUserChangesDetected_Header>
+        <GenSmartUserChangesDetected_Code>false</GenSmartUserChangesDetected_Code>
+        <GenSmartUserChangesDetected_Asembl>false</GenSmartUserChangesDetected_Asembl>
+        <GenMethodPos>0</GenMethodPos>
+        <GenExtraFilesCount>0</GenExtraFilesCount>
+      </InhrCompID_101>
+    </InhrCompID_100>
   </ComponentID_8>
   <ComponentID_11>
     <Generated>true</Generated>

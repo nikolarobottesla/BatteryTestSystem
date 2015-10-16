@@ -14,19 +14,19 @@
 #include "CS1.h"
 
 /* Global Variales */
-static int state=chgMode;			//used to control the run mode of the system idleMode, intResTest, chgMode, disMode, cycleDone
+static int state=CHG_MODE;			//used to control the run mode of the system IDLE_MODE, INT_RES_TEST, CHG_MODE, DIS_MODE, CYCLE_DONE
 static int maxCycles = 1;			//number of charge/discharge cycles
 static int startFirst = 0;			//0=charge first, 1=discharge first
 static int errorType=0;				//declare int used to indicate the error type, 0=no error, 1=current too high
 static int doneReason=0;			//reason the cycle ended, 1= delta peak, 2= temp limit, 3= time limit, 4= discharge Vcut, 5=cell dropout
-static float currentSet=0;			//declare float, sets the battery current, in amps, don't set higher than 7
-static float chgCurrSet=0;			//charge current in A
-static float disCurrSet=0;			//discharge current in A
-static float currentLimit=6.5;		//current limit in A
-static float maxCurrSense=11;		//the maximum current the adc can sense
-static float deltaPeak=0.024;		//delta peak charge cutoff voltage in V (6 cells * 4mV)
-static float disVcut=5.4;			//discharge voltage cutoff in V
-static float VBatRateLimit = -.01;	//cell dropout rate [V/s]
+static int verbose=1;				//if set to 1 the status is printed every loop
+static int chgCurrSet=0;			//charge current in mA
+static int disCurrSet=0;			//discharge current in mA
+static float currentLimit=6500;		//current limit in mA
+static float maxCurrSense=11000;	//the maximum current the adc can sense in mA
+static int deltaPeak=24;			//delta peak charge cutoff voltage in mV (6 cells * 4mV)
+static int disVcut=5400;			//discharge voltage cutoff in mV
+static float VBatRateLimit = -10;	//cell dropout rate [mV/s]
 static float chgTimeout = 120;		//charge cycle timeout in minutes
 static float disTimeout = 120;		//discharge cycle timeout in minutes
 static TickType_t interval = 1000;	//measurement interval in ms
@@ -34,25 +34,23 @@ static TickType_t interval = 1000;	//measurement interval in ms
 //static float disCapLimit = 8000;	//discharge capacity limit [mAh]
 static float capacity;				//accumulates capacity [mAh]
 static float OTthresh = 50;        	//over temperature threshhold in celsius
-//PID variables, PID controls /charge or discharge current
-static float PID_Kp = 0.1;             	//Proportional constant
-static float PID_Ki = 0.05;             //Integral constant
+static float PID_Kp = 0.1;          //Proportional constant
+static float PID_Ki = 0.05;         //Integral constant
 //float Kd = 0.1;             //Derivative constant
 //float prevError = 0;        //previous error value
 //float difError;             //Differential error, difError - err from previous loop'
-static float perCurrent;           	//float, stores the battery current read by the ADC, between 0 and 1
-static float current[dataBuffSize];	//float array, the battery current in Amps, saved to usd card
-static float VBat[dataBuffSize];	//float array, stores the battery voltage in Volts, saved to usd card
-static float temp[dataBuffSize];	//float array, stores the temperature sensor reading in Volts
-static int timeStamp[dataBuffSize]={-1};	//stores the time a measurement was made,
+static float perCurrent;			//float, stores the battery current read by the ADC, between 0 and 1
+static int current[DATA_BUFF_SIZE];	//int array, the battery current in mA, saved to uSD card
+static int VBat[DATA_BUFF_SIZE];	//int array, stores the battery voltage in mV, saved to uSD card
+static int temp[DATA_BUFF_SIZE];	//int array, stores the temperature in C, saved to uSD card
+static int timeStamp[DATA_BUFF_SIZE]={-1};	//stores the time a measurement was made, saved to uSD card
 static int lastStamp;				//stores last loop's timestamp
-static int dp=0;					//data pointer, used to indicate which element is most recent in the measured data arrays
-static int measure_time;			//stores the current measurement iteration for the entire charge or discharge cycle
+static int dp;					//data pointer, used to indicate which element is most recent in the measured data arrays
 static float periodSec;				//period between ADC measurements in seconds
 static uint16_t rawADC[AD1_CHANNEL_COUNT];	//stores latest adc measurements
-static float maxVBat =0;			//maximum battery voltage, Volts
+static int maxVBat;					//maximum battery voltage during charge cycle, mV
 static float deltaVBat;				//difference between the maximum and most recently measured battery voltage, Volts
-static float preVBat;				//stores the previous Vbat measurement
+static float preVBat;				//stores the previous Vbat measurement, Volts
 static float rateVBat;				//the battery voltage rate, used for cell dropout check [volts/sec]
 static float PID_perCurrentSet;		//float, stores the battery current setting scaled between 0 and 1
 static float PID_perCurrentLimit;	//float, stores current limit scaled between 0 and 1
@@ -75,7 +73,7 @@ static portTASK_FUNCTION(control, pvParameters) {
   //initialization
   CHG_PWM_Enable();
   DIS_PWM_Enable();
-  stop_CHG_DIS();
+  Stop_CHG_DIS();
   AD1_Calibrate(1);	//calibrate adc and wait till done
   TickType_t xLastWakeTime= xTaskGetTickCount(); //Declare and init the xLastWakeTime variable with the current time.
 
@@ -83,30 +81,31 @@ static portTASK_FUNCTION(control, pvParameters) {
 
 	  //if this is the first loop load settings
 	  if (timeStamp[0] == -1){
-		  loadSettings();	//load settings, eventually want to load from a file on SD card
+		  Load_Settings();	//load settings
 		  timeStamp[0] = 0;	//set initial timeStamp
 	  }
 
-	  state = chgMode;	//for debugging
+	  state = CHG_MODE;	//for debugging
 
-	  while(state >= chgMode){
+	  while(state >= CHG_MODE){
 
-		  measureAll();
-		  //chkComplete();
+		  Measure_All();
+		  //Chk_Complete();
 
-		  iteratePID();
+		  Iterate_PID();
 		  //write data
 		  LEDR_Neg();
 		  lastStamp = timeStamp[dp];	//save the last time stamp for use in the next loop iteration
+		  timeStamp[dp] = lastStamp + 1;
 
-		  measure_time = measure_time + time_increment;				//number of seconds since the cycle start
 		  dp++;							//increment pointer for data buffers
-		  if (dp >= dataBuffSize)
-		  {
+		  if (dp >= DATA_BUFF_SIZE){
 			  dp=0;						//reset pointer for data buffers
 		  }
 
-		  //CLS1_SendStr("Type in some text with CR or LF at the end...\r\n", CLS1_GetStdio()->stdOut);
+		  //print status if verbose is set to 1
+		  if (verbose == 1)
+			PrintStatus(CLS1_GetStdio());
 
 		  FRTOS1_vTaskDelayUntil(&xLastWakeTime, interval/portTICK_RATE_MS);	//using this vs TaskDelay to get a specific period
 	  }
@@ -116,53 +115,64 @@ static portTASK_FUNCTION(control, pvParameters) {
 }
 
 //function to stop charging or discharging, PWMs are active low
-void stop_CHG_DIS(void)
+void Stop_CHG_DIS(void)
 {
     CHG_PWM_SetRatio16(0xFFFF);	//turn off CHG PFETs to disconnect 12V
     DIS_PWM_SetRatio16(0xFFFF); //turn off discharge NFET if not already off to disconect the load from the circuit.
 	state = -1;     			//set state to done
 }
 
-static void loadSettings(void){
+static void Load_Settings(void){
     /*scale the current setting to a percentage(0 to 1), current sense amplifier is measureing voltage across a .003ohm resisitor with a gain of 100
         Vref is 3.3V, therefore the maximum current that can be read is 3.3V/(.003ohm*100) = 11Amps*/
-    PID_perCurrentSet = currentSet / maxCurrSense;    //currentSet in amps divided by 11A, the maximum current the current sense adc channels can read
-    PID_perCurrentLimit = currentLimit / maxCurrSense;//
-    preVBat=0;								//initialized at 0V to prevent cell dropout detector from triggering on 1st check
-    periodSec = interval / 1000;		//calculate the measure period in seconds
+    if (state == CHG_MODE)
+    	PID_perCurrentSet = chgCurrSet / maxCurrSense;	//currentSet in amps divided by 11A, the maximum current the current sense adc channels can read
+    else if (state == DIS_MODE)
+    	PID_perCurrentSet = disCurrSet / maxCurrSense;	//currentSet in amps divided by 11A, the maximum current the current sense adc channels can read
+
+    PID_perCurrentLimit = currentLimit / maxCurrSense;	//calculate percent current limit
+
+    dp = 0;									//initialize data pointer
+    maxVBat=0;								//initialize to 0mV
+    preVBat=0;								//initialize at 0mV to prevent cell dropout detector from triggering on 1st check
+    periodSec = interval / 1000;			//calculate the measure period in seconds
     PID_intError = 0;
 }
 
-static void measureAll(void){
+static void Measure_All(void){
 	AD1_Measure(1);					//start adc conversion and wait till complete
 	AD1_GetValue16(&rawADC[0]);		//put ADC values in array rawADC
-	VBat[dp] = rawADC[VBAT_SE] / 0xFFFF * 9.9;	//measure the battery voltage, convert to volts, put in array
-	temp[dp] = rawADC[VTEMP] / 0xFFFF *3.3;		//measure the battery temp, convert to volts, put in array
-	temp[dp] = temp[dp]/.01-50;     			//convert to celsius, put in array
-	timeStamp[dp] = lastStamp + 1;
+	VBat[dp] = rawADC[VBAT_SE] / (float)0xFFFF * 9900;	//measure the battery voltage, convert to mV, put in array
+	temp[dp] = rawADC[VTEMP] / (float)0xFFFF * 3300;	//measure the battery temp voltage, convert to mV, put in array
+	temp[dp] = temp[dp] / 10 - 50;     			//convert to celsius, put in array
 
 	//calculate battery current depending on mode
-	if (state==chgMode)			//if in charge mode
+	if (state==CHG_MODE)			//if in charge mode
 		perCurrent = rawADC[CHG_CURR] / (float)0xFFFF;
-	else if (state==disMode)	//else if in discharge mode
+	else if (state==DIS_MODE)	//else if in discharge mode
 		perCurrent = rawADC[DIS_CURR] / (float)0xFFFF;
 
-	current[dp]	= perCurrent * maxCurrSense;	//convert percent current to A and put in array
+	current[dp]	= perCurrent * maxCurrSense;	//convert percent current to mA and put in array
 
 	//send error if current is too high
 	if (perCurrent > PID_perCurrentLimit)   //make sure current is reading below 7A, 7A*.003ohm*100/3.3V = 0.64
 	{
-		errorType = 1;  //set error type to 'current too high'
-		stop_CHG_DIS(); //run function that turns off the charge or discharge
+		errorType = OVER_CURRENT;  //set error type to over current
+		Stop_CHG_DIS(); //run function that turns off the charge or discharge
 	}
+
+	//calculate capacity
+	capacity = capacity + ( current[dp] * (periodSec / 3600) );	// mAh + A/(1000mA/A) * (s / (60s/m) / (60m/h) )
 
 }
 
-static void chkComplete(void){
+static void Chk_Complete(void){
 
-	if (temp[dp] > OTthresh)        //if measured temperature exceeded temperature threshold
+	if (temp[dp] > OTthresh){        //if measured temperature exceeded temperature threshold
 		state = -1;                     //set state to 'cycle done'
-	else if (state==2)              //if in charge state
+		doneReason = OVER_TEMP;			//set done reason
+	}
+	else if (state==CHG_MODE)              //if in charge state
 	{
 
 		//if the charge timeout is reached
@@ -175,13 +185,15 @@ static void chkComplete(void){
 
 		//delta peak check
 		deltaVBat = maxVBat - VBat[dp]; //calculate delta
-		if (deltaVBat > deltaPeak)      //check if delta is larger than allowed
+		if (deltaVBat > deltaPeak){     //check if delta is larger than allowed
 			state = -1;                     //set state to 'cycle done'
+			doneReason = deltaPeak;			//set doneReason
+		}
 
 		//capacity check
 
 	}
-	else if (state==3)              //if in discharge state
+	else if (state==DIS_MODE)              //if in discharge state
 	{
 		//if the discharge timeout is reached
 		if ((timeStamp[dp]*interval) >= (disTimeout*60*interval))
@@ -192,12 +204,12 @@ static void chkComplete(void){
 			state = -1;                     //set state to 'cycle done'
 
 		//check for cell dropout
-		if (VBat[dp] < 7.2)             //start checking when VBat is less than 7.2V
+		if (VBat[dp] < 7200)             //start checking when VBat is less than 7.2V
 		{
 			rateVBat = (VBat[dp] - preVBat)/periodSec; //calculate the instantaneous rate of Vbat change
-			if (rateVBat < VBatRateLimit){           		//if the battery voltage rate is less than the percent cellDropRate
+			if (rateVBat < VBatRateLimit){           		//if the battery voltage rate is less than the cellDropRate
 				state = -1;
-				doneReason = 5;
+				doneReason = DROPOUT;
 			}
 			preVBat = VBat[dp];
 		}
@@ -206,7 +218,7 @@ static void chkComplete(void){
 
 
 //PID function to
-static void iteratePID(void){
+static void Iterate_PID(void){
 	float PID_error;		//expected output minus actual output
 	float PID_output;		//Kp * err + (Ki * intError * dt) + (Kd * difError /dt);
 	uint16_t int_PID_out;	//stores the output as an integer
@@ -243,9 +255,9 @@ static void iteratePID(void){
 			//if(timeStamp[dp] == 5)
 			//{
 				//set battery current depending on mode
-				if (state==chgMode)			//if in charge mode
+				if (state==CHG_MODE)			//if in charge mode
 					CHG_PWM_SetRatio16(int_PID_out);//set charge current
-				else if (state==disMode)	//else if in discharge mode
+				else if (state==DIS_MODE)	//else if in discharge mode
 					DIS_PWM_SetRatio16(int_PID_out);//set discharge current
 			//}
 		}
@@ -253,18 +265,18 @@ static void iteratePID(void){
 
 void APP_Run(void) {
   SHELL_Init();
-  if (FRTOS1_xTaskCreate(
-        R_LEDblink,  /* pointer to the task */
-        "Task1", /* task name for kernel awareness debugging */
-        configMINIMAL_STACK_SIZE, /* task stack size */
-        (void*)NULL, /* optional task startup argument */
-        tskIDLE_PRIORITY,  /* initial priority */
-        (xTaskHandle*)NULL /* optional task handle to create */
+  /*if (FRTOS1_xTaskCreate(
+        R_LEDblink,  // pointer to the task
+        "Task1", // task name for kernel awareness debugging
+        configMINIMAL_STACK_SIZE, // task stack size
+        (void*)NULL, // optional task startup argument
+        tskIDLE_PRIORITY,  // initial priority
+        (xTaskHandle*)NULL // optional task handle to create
       ) != pdPASS) {
-    /*lint -e527 */
-    for(;;){}; /* error! probably out of memory */
-    /*lint +e527 */
-  }
+    //lint -e527
+    for(;;){}; // error! probably out of memory
+    //lint +e527
+  }*/
   if (FRTOS1_xTaskCreate(
           control,  /* pointer to the task */
           "Task2", /* task name for kernel awareness debugging */
@@ -305,13 +317,35 @@ byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOT
   } else if (UTIL1_strcmp((char*)cmd, "BTS status")==0) {
     *handled = TRUE;
     return PrintStatus(io);
-  } /*else if (UTIL1_strncmp((char*)cmd, "FAT1 cd", sizeof("FAT1 cd")-1)==0) {
-    *handled = TRUE;
-    return CdCmd(cmd+sizeof("FAT1"), io);
-  } else if (UTIL1_strncmp((char*)cmd, "FAT1 dir", sizeof("FAT1 dir")-1)==0) {
-    *handled = TRUE;
-    return DirCmd(cmd+sizeof("FAT1"), io);
-  } else if (UTIL1_strncmp((char*)cmd, "FAT1 copy", sizeof("FAT1 copy")-1)==0) {
+  } else if (UTIL1_strncmp((char*)cmd, "BTS chgi ", sizeof("BTS chgi ")-1)==0) {
+	uint8_t res;
+	const unsigned char *p;
+	p = cmd+sizeof("BTS chgi ")-1;
+	res = UTIL1_ScanDecimal32sNumber(&p, &chgCurrSet);
+	if (res!=ERR_OK) {
+	  CLS1_SendStr((unsigned char*)"*** invalid number format! Try e.g. 10\r\n", io->stdErr);
+	  return ERR_FAILED;
+	}
+	else{
+		Load_Current(chgCurrSet);
+	}
+	*handled = TRUE;
+	return ERR_OK;
+  } else if (UTIL1_strncmp((char*)cmd, "BTS disi ", sizeof("BTS disi ")-1)==0) {
+		uint8_t res;
+		const unsigned char *p;
+		p = cmd+sizeof("BTS disi ")-1;
+		res = UTIL1_ScanDecimal32sNumber(&p, &disCurrSet);
+		if (res!=ERR_OK) {
+		  CLS1_SendStr((unsigned char*)"*** invalid number format! Try e.g. 10\r\n", io->stdErr);
+		  return ERR_FAILED;
+		}
+		else{
+				Load_Current(disCurrSet);
+		}
+		*handled = TRUE;
+		return ERR_OK;
+  }/* else if (UTIL1_strncmp((char*)cmd, "FAT1 copy", sizeof("FAT1 copy")-1)==0) {
     *handled = TRUE;
     return CopyCmd(cmd+sizeof("FAT1"), io);
   } else if (UTIL1_strncmp((char*)cmd, "FAT1 delete", sizeof("FAT1 delete")-1)==0) {
@@ -343,8 +377,8 @@ byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOT
 static uint8_t PrintHelp(const CLS1_StdIOType *io) {
   CLS1_SendHelpStr((unsigned char*)"BTS", (unsigned char*)"Group of BTS commands\r\n", io->stdOut);
   CLS1_SendHelpStr((unsigned char*)"  help|status", (unsigned char*)"Print help or status information\r\n", io->stdOut);
-  CLS1_SendHelpStr((unsigned char*)"  chgi <current>", (const unsigned char*)"Set the charge current in Amps\r\n", io->stdOut);
-  CLS1_SendHelpStr((unsigned char*)"  disi <current>", (const unsigned char*)"Set the discharge current in Amps\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  chgi <current>", (const unsigned char*)"Set the charge current in mA\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  disi <current>", (const unsigned char*)"Set the discharge current in mA\r\n", io->stdOut);
   CLS1_SendHelpStr((unsigned char*)"  serial <pack serial>", (const unsigned char*)"Set pack serial\r\n", io->stdOut);
   CLS1_SendHelpStr((unsigned char*)"  subpack <subpack code>", (const unsigned char*)"set subpack code\r\n", io->stdOut);
   CLS1_SendHelpStr((unsigned char*)"  start", (const unsigned char*)"start battery capacity test\r\n", io->stdOut);
@@ -356,22 +390,34 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io) {
 
 //used by BTS_ParseCommand to print status message
 static uint8_t PrintStatus(const CLS1_StdIOType *io) {
-	int currentmA = (int)(current[dp] * 1000);
-	int vbatmV = (int)(vbat[dp] * 1000);
-	int intCapacity = (int) (capacity);
-	//temperature
-	CLS1_SendStatusStr((unsigned char*)"BTS", (unsigned char*)"\r\n", io->stdOut);
+	int intCapacity = (int) capacity; 			//convert capacity to int
+	int32_t duration = timeStamp[dp];
+	//CLS1_SendStatusStr((unsigned char*)"BTS", (unsigned char*)"\r\n", io->stdOut);
 	UTIL1_Num32sToStr(charBuff,64,state);
 	CLS1_SendStatusStr((unsigned char*)"  mode", charBuff, io->stdOut);
-	UTIL1_Num32sToStr(charBuff,64,currentmA);
-	CLS1_SendStatusStr((unsigned char*)"  current[mA]", charBuff, io->stdOut);
-	UTIL1_Num32sToStr(charBuff,64,vbatmV);
-	CLS1_SendStatusStr((unsigned char*)"  voltage[mV]", charBuff, io->stdOut);
-	UTIL1_Num32sToStr(charBuff,64,timeS);
-	CLS1_SendStatusStr((unsigned char*)"  cycle time[s]", charBuff, io->stdOut);
-	UTIL1_Num32sToStr(charBuff,64,capcity);
-	CLS1_SendStatusStr((unsigned char*)"  capacity[mAh]", charBuff, io->stdOut);
+	UTIL1_Num32sToStr(charBuff,64,current[dp]);
+	CLS1_SendStatusStr((unsigned char*)"  Ibat[mA]", charBuff, io->stdOut);
+	UTIL1_Num32sToStr(charBuff,64,VBat[dp]);
+	CLS1_SendStatusStr((unsigned char*)"  Vbat[mV]", charBuff, io->stdOut);
+	UTIL1_Num32sToStr(charBuff,64,duration);
+	CLS1_SendStatusStr((unsigned char*)"  duration[s]", charBuff, io->stdOut);
+	UTIL1_Num32sToStr(charBuff,64,intCapacity);
+	CLS1_SendStatusStr((unsigned char*)"  cap[mAh]", charBuff, io->stdOut);
+	UTIL1_Num32sToStr(charBuff,64,temp[dp]);
+	CLS1_SendStatusStr((unsigned char*)"  batTemp[C]", charBuff, io->stdOut);
 	CLS1_SendStr((unsigned char*)"\r\n", io->stdOut);
 	return ERR_OK;
 }
 
+//loads the current
+static void Load_Current(int newCurrent){
+	PID_perCurrentSet = (float)newCurrent / maxCurrSense;	//newCurrent in mA divided by the maximum current the current sense adc channels can read
+}
+
+static void State_Machine(){
+	/*if (state == IDLE_MODE){
+		//check for start
+	}*/
+
+
+}

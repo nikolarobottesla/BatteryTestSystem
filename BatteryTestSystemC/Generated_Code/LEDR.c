@@ -7,7 +7,7 @@
 **     Version     : Component 01.063, Driver 01.00, CPU db: 3.00.000
 **     Repository  : mcuoneclipse
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-26, 01:31, # CodeGen: 5
+**     Date/Time   : 2015-10-14, 20:34, # CodeGen: 33
 **     Abstract    :
 **          This component implements a universal driver for a single LED.
 **     Settings    :
