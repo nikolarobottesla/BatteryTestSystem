@@ -2020,7 +2020,7 @@
     <ExtraFile27>Generated_Code\FreeRTOS.h</ExtraFile27>
     <ExtraFile28>Generated_Code\croutine.c</ExtraFile28>
     <ExtraFile29>Generated_Code\croutine.h</ExtraFile29>
-    <InhrCompID_104>
+    <InhrCompID_105>
       <Generated>false</Generated>
       <GenCompName />
       <GenComponentVersion>??.???</GenComponentVersion>
@@ -2068,7 +2068,7 @@
       <GenSmartUserChangesDetected_Asembl>false</GenSmartUserChangesDetected_Asembl>
       <GenMethodPos>0</GenMethodPos>
       <GenExtraFilesCount>0</GenExtraFilesCount>
-    </InhrCompID_104>
+    </InhrCompID_105>
   </ComponentID_3>
   <ComponentID_8>
     <Generated>true</Generated>

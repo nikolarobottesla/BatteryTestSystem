@@ -45,7 +45,7 @@ static int VBat[DATA_BUFF_SIZE];	//int array, stores the battery voltage in mV, 
 static int temp[DATA_BUFF_SIZE];	//int array, stores the temperature in C, saved to uSD card
 static int timeStamp[DATA_BUFF_SIZE]={-1};	//stores the time a measurement was made, saved to uSD card
 static int lastStamp;				//stores last loop's timestamp
-static int dp;					//data pointer, used to indicate which element is most recent in the measured data arrays
+static int dp;						//data pointer, used to indicate which element is most recent in the measured data arrays
 static float periodSec;				//period between ADC measurements in seconds
 static uint16_t rawADC[AD1_CHANNEL_COUNT];	//stores latest adc measurements
 static int maxVBat;					//maximum battery voltage during charge cycle, mV
@@ -88,6 +88,7 @@ static portTASK_FUNCTION(control, pvParameters) {
 	  state = CHG_MODE;	//for debugging
 
 	  while(state >= CHG_MODE){
+		  timeStamp[dp] = lastStamp + 1;
 
 		  Measure_All();
 		  //Chk_Complete();
@@ -96,16 +97,15 @@ static portTASK_FUNCTION(control, pvParameters) {
 		  //write data
 		  LEDR_Neg();
 		  lastStamp = timeStamp[dp];	//save the last time stamp for use in the next loop iteration
-		  timeStamp[dp] = lastStamp + 1;
+
+		  //print status if verbose is set to 1
+		  if (verbose == 1)
+			PrintStatus(CLS1_GetStdio());
 
 		  dp++;							//increment pointer for data buffers
 		  if (dp >= DATA_BUFF_SIZE){
 			  dp=0;						//reset pointer for data buffers
 		  }
-
-		  //print status if verbose is set to 1
-		  if (verbose == 1)
-			PrintStatus(CLS1_GetStdio());
 
 		  FRTOS1_vTaskDelayUntil(&xLastWakeTime, interval/portTICK_RATE_MS);	//using this vs TaskDelay to get a specific period
 	  }
@@ -133,6 +133,7 @@ static void Load_Settings(void){
     PID_perCurrentLimit = currentLimit / maxCurrSense;	//calculate percent current limit
 
     dp = 0;									//initialize data pointer
+    lastStamp = 0;							//initialize last time stamp
     maxVBat=0;								//initialize to 0mV
     preVBat=0;								//initialize at 0mV to prevent cell dropout detector from triggering on 1st check
     periodSec = interval / 1000;			//calculate the measure period in seconds
