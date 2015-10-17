@@ -14,9 +14,9 @@
 #include "CS1.h"
 
 /* Global Variales */
-static int state=CHG_MODE;			//used to control the run mode of the system IDLE_MODE, INT_RES_TEST, CHG_MODE, DIS_MODE, CYCLE_DONE
+static int state=IDLE_MODE;			//used to control the run mode of the system IDLE_MODE, INT_RES_TEST, CHG_MODE, DIS_MODE, CYCLE_DONE
 static int maxCycles = 1;			//number of charge/discharge cycles
-static int startFirst = 0;			//0=charge first, 1=discharge first
+static int startFirst = CHG_MODE;	//set to start charge or discharge as the first cycle
 static int errorType=0;				//declare int used to indicate the error type, 0=no error, 1=current too high
 static int doneReason=0;			//reason the cycle ended, 1= delta peak, 2= temp limit, 3= time limit, 4= discharge Vcut, 5=cell dropout
 static int verbose=1;				//if set to 1 the status is printed every loop
@@ -32,6 +32,7 @@ static float disTimeout = 120;		//discharge cycle timeout in minutes
 static TickType_t interval = 1000;	//measurement interval in ms
 //static float chgCapLimit = 12000;	//charge capacity limit [mAh]
 //static float disCapLimit = 8000;	//discharge capacity limit [mAh]
+static int cyclesLeft = 0;			//number of cycles left over not including current cycle
 static float capacity;				//accumulates capacity [mAh]
 static float OTthresh = 50;        	//over temperature threshhold in celsius
 static float PID_Kp = 0.1;          //Proportional constant
@@ -416,9 +417,17 @@ static void Load_Current(int newCurrent){
 }
 
 static void State_Machine(){
-	/*if (state == IDLE_MODE){
+	if (doneReason == DELTA_PEAK){
 		//check for start
-	}*/
+	}
+}
 
+static void Start(){
+	state = startFirst;
+	if (cyclesLeft = 0){
+		cyclesLeft = maxCycles - 1;
+	}else{
+		cyclesLeft = cyclesLeft - 1;
+	}
 
 }
