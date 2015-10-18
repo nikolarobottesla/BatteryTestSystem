@@ -32,6 +32,7 @@ static float disTimeout = 120;		//discharge cycle timeout in minutes
 static TickType_t interval = 1000;	//measurement interval in ms
 //static float chgCapLimit = 12000;	//charge capacity limit [mAh]
 //static float disCapLimit = 8000;	//discharge capacity limit [mAh]
+static int nextState = 0;
 static int cyclesLeft = 0;			//number of cycles left over not including current cycle
 static float capacity;				//accumulates capacity [mAh]
 static float OTthresh = 50;        	//over temperature threshhold in celsius
@@ -80,13 +81,17 @@ static portTASK_FUNCTION(control, pvParameters) {
 
   for(;;) {
 
+	  //if cycle is done start the next cycle
+	  if (state==CYCLE_DONE)
+		  Start();
+
 	  //if this is the first loop load settings
 	  if (timeStamp[0] == -1){
 		  Load_Settings();	//load settings
 		  timeStamp[0] = 0;	//set initial timeStamp
 	  }
 
-	  state = CHG_MODE;	//for debugging
+	  //state = CHG_MODE;	//for debugging
 
 	  while(state >= CHG_MODE){
 		  timeStamp[dp] = lastStamp + 1;
@@ -120,7 +125,6 @@ void Stop_CHG_DIS(void)
 {
     CHG_PWM_SetRatio16(0xFFFF);	//turn off CHG PFETs to disconnect 12V
     DIS_PWM_SetRatio16(0xFFFF); //turn off discharge NFET if not already off to disconect the load from the circuit.
-	state = -1;     			//set state to done
 }
 
 static void Load_Settings(void){
@@ -176,20 +180,20 @@ static void Chk_Complete(void){
 	}
 	else if (state==CHG_MODE)              //if in charge state
 	{
-
-		//if the charge timeout is reached
-		if ((timeStamp[dp]*interval) >= (chgTimeout*60*interval))
-			state = -1;		//set state to 'cycle done'
-
 		//determine maximum voltage so far
-		if (VBat[dp] > maxVBat)         //if most recent voltage reading is greater than max reading so far
-			maxVBat = VBat[dp];             //assign maxVBat new higher value
+		if (VBat[dp] > maxVBat)     //if most recent voltage reading is greater than max reading so far
+			maxVBat = VBat[dp];     //assign maxVBat new higher value
 
 		//delta peak check
 		deltaVBat = maxVBat - VBat[dp]; //calculate delta
-		if (deltaVBat > deltaPeak){     //check if delta is larger than allowed
-			state = -1;                     //set state to 'cycle done'
-			doneReason = deltaPeak;			//set doneReason
+
+		//if the charge timeout is reached
+		if ((timeStamp[dp]*interval) >= (chgTimeout*60*interval)){
+			state = CYCLE_DONE;					//set state to 'cycle done'
+			doneReason = TIMEOUT;				//set doneReason
+		}else if (deltaVBat > deltaPeak){	//check if delta is larger than allowed
+			state = CYCLE_DONE;					//set state to 'cycle done'
+			doneReason = deltaPeak;				//set doneReason
 		}
 
 		//capacity check
@@ -225,44 +229,45 @@ static void Iterate_PID(void){
 	float PID_output;		//Kp * err + (Ki * intError * dt) + (Kd * difError /dt);
 	uint16_t int_PID_out;	//stores the output as an integer
 
-	if (state<=1) {}                    //if off or measuring resistance, do nothing
-		else                                //else in charge mode or discharge mode
+	if (state<=1) {		//if off
+		Stop_CHG_DIS();		//make sure the output is off
+	}else				//else in charge mode or discharge mode
+	{
+
+
+
+		PID_error = PID_perCurrentSet - perCurrent; 				//calculate PID error
+		PID_intError = PID_intError + (PID_error * periodSec);		//calculate integral error
+		PID_output = PID_Kp * PID_error + PID_Ki * PID_intError;	//PWM output value
+
+		//if PID is trying to set current to < 0 value, set output to zero
+		if (PID_output < 0)
 		{
-
-
-
-			PID_error = PID_perCurrentSet - perCurrent; 				//calculate PID error
-			PID_intError = PID_intError + (PID_error * periodSec);		//calculate integral error
-			PID_output = PID_Kp * PID_error + PID_Ki * PID_intError;	//PWM output value
-
-			//if PID is trying to set current to < 0 value, set output to zero
-			if (PID_output < 0)
-			{
-				PID_output = 0;
-			}
-			else if (PID_output > 1)
-			{
-				PID_output =1;
-			}
-
-			int_PID_out = PID_output * 0xFFFF;			//convert from float to 16 bit integer value
-			int_PID_out = 0xFFFF - int_PID_out;			//PWMs are active low, subtract from full scale so PWM acts active high
-
-			/* used for debugging*/
-			//accumulator = accumulator - 100;
-			//int_PID_out = accumulator;
-			//int_PID_out = 65350;
-			//printf("\n\r output=%f, error=%f, intError=%f",
-			//int_PID_out, PID_output, PID_error, PID_intError);
-			//if(timeStamp[dp] == 5)
-			//{
-				//set battery current depending on mode
-				if (state==CHG_MODE)			//if in charge mode
-					CHG_PWM_SetRatio16(int_PID_out);//set charge current
-				else if (state==DIS_MODE)	//else if in discharge mode
-					DIS_PWM_SetRatio16(int_PID_out);//set discharge current
-			//}
+			PID_output = 0;
 		}
+		else if (PID_output > 1)
+		{
+			PID_output =1;
+		}
+
+		int_PID_out = PID_output * 0xFFFF;			//convert from float to 16 bit integer value
+		int_PID_out = 0xFFFF - int_PID_out;			//PWMs are active low, subtract from full scale so PWM acts active high
+
+		/* used for debugging*/
+		//accumulator = accumulator - 100;
+		//int_PID_out = accumulator;
+		//int_PID_out = 65350;
+		//printf("\n\r output=%f, error=%f, intError=%f",
+		//int_PID_out, PID_output, PID_error, PID_intError);
+		//if(timeStamp[dp] == 5)
+		//{
+			//set battery current depending on mode
+			if (state==CHG_MODE)			//if in charge mode
+				CHG_PWM_SetRatio16(int_PID_out);//set charge current
+			else if (state==DIS_MODE)	//else if in discharge mode
+				DIS_PWM_SetRatio16(int_PID_out);//set discharge current
+		//}
+	}
 }
 
 void APP_Run(void) {
@@ -419,15 +424,37 @@ static void Load_Current(int newCurrent){
 static void State_Machine(){
 	if (doneReason == DELTA_PEAK){
 		//check for start
+		nextState = DIS_MODE;
+		CLS1_SendStr((unsigned char*)"delta peak V detected, charge cycle complete", io->stdOut);	//print status message
+	}else if (doneReason == VBAT_CUT || doneReason == DROPOUT){
+		nextState = CHG_MODE;
+		CLS1_SendStr((unsigned char*)"battery V cut off reached, discharge cycle complete", io->stdOut);	//print status message
+	}else if (doneReason == TIMEOUT){
+		CLS1_SendStr((unsigned char*)"cycle ended due to timeout\r\n", io->stdOut);
+	}else if (doneReason == OVER_TEMP){
+		CLS1_SendStr((unsigned char*)"cycle ended due to timeout\r\n", io->stdOut);
 	}
 }
 
+static void Cycle_Done(){
+
+}
+
 static void Start(){
-	state = startFirst;
-	if (cyclesLeft = 0){
-		cyclesLeft = maxCycles - 1;
+
+	if (cyclesLeft = 0){			//if this is the first start
+		cyclesLeft = maxCycles - 1;		//set the max number of cycles to do
+		state = startFirst;
 	}else{
 		cyclesLeft = cyclesLeft - 1;
+		state = nextState;
+	}
+
+	//load the new current value depending on the state
+	if (state == CHG_Mode){
+		Load_Current(chgCurrent);
+	}else if (state == DIS_Mode){
+		Load_Current(chgCurrent);
 	}
 
 }
