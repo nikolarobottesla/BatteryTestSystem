@@ -16,9 +16,9 @@
 /* Global Variales */
 static int state=IDLE_MODE;			//used to control the run mode of the system IDLE_MODE, INT_RES_TEST, CHG_MODE, DIS_MODE, CYCLE_DONE
 static int maxCycles = 1;			//number of charge/discharge cycles
-static int startFirst = CHG_MODE;	//set to start charge or discharge as the first cycle
+static int firstState = CHG_MODE;	//set to start charge or discharge as the first cycle
 static int errorType=0;				//declare int used to indicate the error type, 0=no error, 1=current too high
-static int doneReason=0;			//reason the cycle ended, 1= delta peak, 2= temp limit, 3= time limit, 4= discharge Vcut, 5=cell dropout
+static int doneReason=0;			//reason the cycle ended, see header file for macro
 static int verbose=1;				//if set to 1 the status is printed every loop
 static int chgCurrSet=0;			//charge current in mA
 static int disCurrSet=0;			//discharge current in mA
@@ -27,12 +27,13 @@ static float maxCurrSense=11000;	//the maximum current the adc can sense in mA
 static int deltaPeak=24;			//delta peak charge cutoff voltage in mV (6 cells * 4mV)
 static int disVcut=5400;			//discharge voltage cutoff in mV
 static float VBatRateLimit = -10;	//cell dropout rate [mV/s]
-static float chgTimeout = 120;		//charge cycle timeout in minutes
-static float disTimeout = 120;		//discharge cycle timeout in minutes
+static int chgTimeout = 120;		//charge cycle timeout in minutes
+static int disTimeout = 120;		//discharge cycle timeout in minutes
 static TickType_t interval = 1000;	//measurement interval in ms
-//static float chgCapLimit = 12000;	//charge capacity limit [mAh]
-//static float disCapLimit = 8000;	//discharge capacity limit [mAh]
-static int nextState = 0;
+static unsigned int waitTime = 5;	//wait time between cycles in minutes
+static int chgCapLimit = 10000;		//charge capacity limit [mAh]
+static int disCapLimit = 8000;		//discharge capacity limit [mAh]
+static int nextState = 0;			//state machine tells the start routine the next state using this variable
 static int cyclesLeft = 0;			//number of cycles left over not including current cycle
 static float capacity;				//accumulates capacity [mAh]
 static float OTthresh = 50;        	//over temperature threshhold in celsius
@@ -100,7 +101,7 @@ static portTASK_FUNCTION(control, pvParameters) {
 		  //Chk_Complete();
 
 		  Iterate_PID();
-		  //write data
+//TODO	  //write data to uSD
 		  LEDR_Neg();
 		  lastStamp = timeStamp[dp];	//save the last time stamp for use in the next loop iteration
 
@@ -116,6 +117,9 @@ static portTASK_FUNCTION(control, pvParameters) {
 		  FRTOS1_vTaskDelayUntil(&xLastWakeTime, interval/portTICK_RATE_MS);	//using this vs TaskDelay to get a specific period
 	  }
 
+	  if ( doneReason > 0 ){
+		  State_Machine();}		//choose what to do next
+
 	  FRTOS1_vTaskDelay(5000/portTICK_RATE_MS);
   }
 }
@@ -125,6 +129,7 @@ void Stop_CHG_DIS(void)
 {
     CHG_PWM_SetRatio16(0xFFFF);	//turn off CHG PFETs to disconnect 12V
     DIS_PWM_SetRatio16(0xFFFF); //turn off discharge NFET if not already off to disconect the load from the circuit.
+    state = CYCLE_DONE;			//set state to cycle done
 }
 
 static void Load_Settings(void){
@@ -175,46 +180,45 @@ static void Measure_All(void){
 static void Chk_Complete(void){
 
 	if (temp[dp] > OTthresh){        //if measured temperature exceeded temperature threshold
-		state = -1;                     //set state to 'cycle done'
+		state = CYCLE_DONE;             //set state to 'cycle done'
 		doneReason = OVER_TEMP;			//set done reason
-	}
-	else if (state==CHG_MODE)              //if in charge state
-	{
+
+	}else if (state==CHG_MODE){              //if in charge state
 		//determine maximum voltage so far
 		if (VBat[dp] > maxVBat)     //if most recent voltage reading is greater than max reading so far
 			maxVBat = VBat[dp];     //assign maxVBat new higher value
 
 		//delta peak check
 		deltaVBat = maxVBat - VBat[dp]; //calculate delta
-
+		if (deltaVBat > deltaPeak){
+			state = CYCLE_DONE;					//set state to 'cycle done'
+			doneReason = DELTA_PEAK;				//set doneReason
 		//if the charge timeout is reached
-		if ((timeStamp[dp]*interval) >= (chgTimeout*60*interval)){
+		}else if ((timeStamp[dp]*interval) >= (chgTimeout*60*interval)){	//check if delta is larger than allowed
 			state = CYCLE_DONE;					//set state to 'cycle done'
-			doneReason = TIMEOUT;				//set doneReason
-		}else if (deltaVBat > deltaPeak){	//check if delta is larger than allowed
-			state = CYCLE_DONE;					//set state to 'cycle done'
-			doneReason = deltaPeak;				//set doneReason
+			doneReason = TIMEOUT;			//set doneReason
 		}
 
-		//capacity check
+//TODO	//capacity check charge and discharge
 
-	}
-	else if (state==DIS_MODE)              //if in discharge state
-	{
+	}else if (state==DIS_MODE){              //if in discharge state
+
 		//if the discharge timeout is reached
-		if ((timeStamp[dp]*interval) >= (disTimeout*60*interval))
-			state = -1;		//set state to 'cycle done'
-
+		if ((timeStamp[dp]*interval) >= (disTimeout*60*interval)){
+			state = CYCLE_DONE;		//set state to 'cycle done'
+			doneReason = TIMEOUT;	//
+		}
 		//measure threshhold
 		if (VBat[dp] < disVcut)         //if the latest measured voltage is less than the discharge cut off
-			state = -1;                     //set state to 'cycle done'
+			state = CYCLE_DONE;                     //set state to 'cycle done'
+			doneReason = DROPOUT;
 
 		//check for cell dropout
 		if (VBat[dp] < 7200)             //start checking when VBat is less than 7.2V
 		{
 			rateVBat = (VBat[dp] - preVBat)/periodSec; //calculate the instantaneous rate of Vbat change
 			if (rateVBat < VBatRateLimit){           		//if the battery voltage rate is less than the cellDropRate
-				state = -1;
+				state = CYCLE_DONE;
 				doneReason = DROPOUT;
 			}
 			preVBat = VBat[dp];
@@ -421,40 +425,55 @@ static void Load_Current(int newCurrent){
 	PID_perCurrentSet = (float)newCurrent / maxCurrSense;	//newCurrent in mA divided by the maximum current the current sense adc channels can read
 }
 
-static void State_Machine(){
+static void State_Machine(const CLS1_StdIOType *io){
+	unsigned int waitTimeMs;
+
 	if (doneReason == DELTA_PEAK){
-		//check for start
 		nextState = DIS_MODE;
 		CLS1_SendStr((unsigned char*)"delta peak V detected, charge cycle complete", io->stdOut);	//print status message
-	}else if (doneReason == VBAT_CUT || doneReason == DROPOUT){
+	}else if (doneReason == VBAT_CUT){
 		nextState = CHG_MODE;
 		CLS1_SendStr((unsigned char*)"battery V cut off reached, discharge cycle complete", io->stdOut);	//print status message
+	}else if (doneReason == DROPOUT){
+		nextState = CHG_MODE;
+		CLS1_SendStr((unsigned char*)"cell dropout occured, discharge cycle complete", io->stdOut);	//print status message
 	}else if (doneReason == TIMEOUT){
-		CLS1_SendStr((unsigned char*)"cycle ended due to timeout\r\n", io->stdOut);
+		CLS1_SendStr((unsigned char*)"cycle ended due to timeout, aborting\r\n", io->stdOut);
+		nextState = IDLE_MODE;
 	}else if (doneReason == OVER_TEMP){
-		CLS1_SendStr((unsigned char*)"cycle ended due to timeout\r\n", io->stdOut);
+		CLS1_SendStr((unsigned char*)"cycle ended due to over temperature, aborting\r\n", io->stdOut);
+		nextState = IDLE_MODE;
 	}
+
+	if (doneReason <= DROPOUT){
+		waitTimeMs = waitTime * 60000;	//calculate wait time in ms
+		UTIL1_Num32uToStr(charBuff,64,waitTime);
+		CLS1_SendStatusStr((unsigned char*)"  waiting[min]", charBuff, io->stdOut);
+		FRTOS1_vTaskDelay(waitTimeMs/portTICK_RATE_MS);	//wait between cycles
+	}
+
+	doneReason = 0;		//reset done reason
 }
 
 static void Cycle_Done(){
-
+	state = CYCLE_DONE;
 }
 
 static void Start(){
 
-	if (cyclesLeft = 0){			//if this is the first start
+	if (cyclesLeft == 0){			//if this is the first start
 		cyclesLeft = maxCycles - 1;		//set the max number of cycles to do
-		state = startFirst;
+		state = firstState;
 	}else{
 		cyclesLeft = cyclesLeft - 1;
 		state = nextState;
 	}
 
 	//load the new current value depending on the state
-	if (state == CHG_Mode){
-		Load_Current(chgCurrent);
-	}else if (state == DIS_Mode){
-		Load_Current(chgCurrent);
+	if (state == CHG_MODE){
+		Load_Current(chgCurrSet);
+	}else if (state == DIS_MODE){
+		Load_Current(disCurrSet);
 	}
 
 }

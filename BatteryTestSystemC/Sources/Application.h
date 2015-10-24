@@ -29,9 +29,9 @@ void APP_Run(void);
 //used to indicate reason for stopping chg/dis
 #define DELTA_PEAK 1
 #define VBAT_CUT 2
-#define TIMEOUT	3
+#define DROPOUT	3
 #define OVER_TEMP 4
-#define DROPOUT 5
+#define TIMEOUT 5
 #define OVER_CAPACITY 6
 #define USER_COMMAND 7
 
@@ -56,7 +56,7 @@ static void Chk_Complete(void);
 static void Write_Data(void);
 static void Iterate_PID(void);
 static void Stop_CHG_DIS(void);        //immediately stops charging or discharging
-static void Start_CHG_DIS(void);       //
+static void Start();
 byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOType *io);
 static uint8_t PrintHelp(const CLS1_StdIOType *io);
 static uint8_t PrintStatus(const CLS1_StdIOType *io);
