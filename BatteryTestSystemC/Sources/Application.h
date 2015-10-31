@@ -34,10 +34,7 @@ void APP_Run(void);
 #define TIMEOUT 5
 #define OVER_CAPACITY 6
 #define USER_COMMAND 7
-
-//used to indicate error type, variable: error
-#define NO_ERROR 0
-#define OVER_CURRENT 1
+#define OVER_CURRENT 8
 
 //define ADC channels
 #define CHG_CURR 0
@@ -56,10 +53,12 @@ static void Chk_Complete(void);
 static void Write_Data(void);
 static void Iterate_PID(void);
 static void Stop_CHG_DIS(void);        //immediately stops charging or discharging
-static void Start();
+static uint8_t Start(const CLS1_StdIOType *io);
+static uint8_t Stop(const CLS1_StdIOType *io);
 byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOType *io);
 static uint8_t PrintHelp(const CLS1_StdIOType *io);
 static uint8_t PrintStatus(const CLS1_StdIOType *io);
 static void Load_Current(int newCurrent);
+static uint8_t Toggle_Verbose();
 
 

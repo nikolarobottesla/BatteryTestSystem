@@ -14,20 +14,19 @@
 #include "CS1.h"
 
 /* Global Variales */
-static int state=IDLE_MODE;			//used to control the run mode of the system IDLE_MODE, INT_RES_TEST, CHG_MODE, DIS_MODE, CYCLE_DONE
-static int maxCycles = 1;			//number of charge/discharge cycles
+static volatile int state=IDLE_MODE;//used to control the run mode of the system IDLE_MODE, INT_RES_TEST, CHG_MODE, DIS_MODE, CYCLE_DONE
+static int maxCycles = 2;			//number of charge/discharge cycles
 static int firstState = CHG_MODE;	//set to start charge or discharge as the first cycle
-static int errorType=0;				//declare int used to indicate the error type, 0=no error, 1=current too high
-static int doneReason=0;			//reason the cycle ended, see header file for macro
-static int verbose=1;				//if set to 1 the status is printed every loop
-static int chgCurrSet=0;			//charge current in mA
-static int disCurrSet=0;			//discharge current in mA
+static volatile int doneReason=0;	//reason the cycle ended, see header file for macro
+static int verbose=0;				//if set to 1 the status is printed every loop
+static volatile int chgCurrSet=0;	//charge current in mA
+static volatile int disCurrSet=0;	//discharge current in mA
 static float currentLimit=6500;		//current limit in mA
 static float maxCurrSense=11000;	//the maximum current the adc can sense in mA
 static int deltaPeak=24;			//delta peak charge cutoff voltage in mV (6 cells * 4mV)
 static int disVcut=5400;			//discharge voltage cutoff in mV
 static float VBatRateLimit = -10;	//cell dropout rate [mV/s]
-static int chgTimeout = 120;		//charge cycle timeout in minutes
+static int chgTimeout = 1;		//charge cycle timeout in minutes
 static int disTimeout = 120;		//discharge cycle timeout in minutes
 static TickType_t interval = 1000;	//measurement interval in ms
 static unsigned int waitTime = 5;	//wait time between cycles in minutes
@@ -82,23 +81,15 @@ static portTASK_FUNCTION(control, pvParameters) {
 
   for(;;) {
 
-	  //if cycle is done start the next cycle
-	  if (state==CYCLE_DONE)
-		  Start();
-
-	  //if this is the first loop load settings
-	  if (timeStamp[0] == -1){
-		  Load_Settings();	//load settings
-		  timeStamp[0] = 0;	//set initial timeStamp
+	  if (state==CYCLE_DONE){	//if this is the start of a new cycle
+		  Load_Settings();			//load settings
 	  }
-
-	  //state = CHG_MODE;	//for debugging
 
 	  while(state >= CHG_MODE){
 		  timeStamp[dp] = lastStamp + 1;
 
 		  Measure_All();
-		  //Chk_Complete();
+		  Chk_Complete();
 
 		  Iterate_PID();
 //TODO	  //write data to uSD
@@ -129,21 +120,24 @@ void Stop_CHG_DIS(void)
 {
     CHG_PWM_SetRatio16(0xFFFF);	//turn off CHG PFETs to disconnect 12V
     DIS_PWM_SetRatio16(0xFFFF); //turn off discharge NFET if not already off to disconect the load from the circuit.
-    state = CYCLE_DONE;			//set state to cycle done
 }
 
 static void Load_Settings(void){
-    /*scale the current setting to a percentage(0 to 1), current sense amplifier is measureing voltage across a .003ohm resisitor with a gain of 100
-        Vref is 3.3V, therefore the maximum current that can be read is 3.3V/(.003ohm*100) = 11Amps*/
-    if (state == CHG_MODE)
-    	PID_perCurrentSet = chgCurrSet / maxCurrSense;	//currentSet in amps divided by 11A, the maximum current the current sense adc channels can read
-    else if (state == DIS_MODE)
-    	PID_perCurrentSet = disCurrSet / maxCurrSense;	//currentSet in amps divided by 11A, the maximum current the current sense adc channels can read
+
+	if (state == CHG_MODE){
+		Load_Current(chgCurrSet);
+	}else if (state == DIS_MODE){
+		Load_Current(disCurrSet);
+	}
 
     PID_perCurrentLimit = currentLimit / maxCurrSense;	//calculate percent current limit
 
+	cyclesLeft = cyclesLeft - 1;
+	state = nextState;
+
     dp = 0;									//initialize data pointer
     lastStamp = 0;							//initialize last time stamp
+	timeStamp[0] = 0;						//set initial timeStamp
     maxVBat=0;								//initialize to 0mV
     preVBat=0;								//initialize at 0mV to prevent cell dropout detector from triggering on 1st check
     periodSec = interval / 1000;			//calculate the measure period in seconds
@@ -168,7 +162,8 @@ static void Measure_All(void){
 	//send error if current is too high
 	if (perCurrent > PID_perCurrentLimit)   //make sure current is reading below 7A, 7A*.003ohm*100/3.3V = 0.64
 	{
-		errorType = OVER_CURRENT;  //set error type to over current
+	    state = CYCLE_DONE;			//set state to cycle done
+		doneReason = OVER_CURRENT;  //set error type to over current
 		Stop_CHG_DIS(); //run function that turns off the charge or discharge
 	}
 
@@ -290,8 +285,8 @@ void APP_Run(void) {
   }*/
   if (FRTOS1_xTaskCreate(
           control,  /* pointer to the task */
-          "Task2", /* task name for kernel awareness debugging */
-          configMINIMAL_STACK_SIZE, /* task stack size */
+          "main", /* task name for kernel awareness debugging */
+          configMINIMAL_STACK_SIZE+200, /* task stack size */
           (void*)NULL, /* optional task startup argument */
           tskIDLE_PRIORITY,  /* initial priority */
           (xTaskHandle*)NULL /* optional task handle to create */
@@ -356,7 +351,16 @@ byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOT
 		}
 		*handled = TRUE;
 		return ERR_OK;
-  }/* else if (UTIL1_strncmp((char*)cmd, "FAT1 copy", sizeof("FAT1 copy")-1)==0) {
+  }else if (UTIL1_strcmp((char*)cmd, "BTS start")==0) {
+	    *handled = TRUE;
+	    return Start(io);
+  }else if (UTIL1_strcmp((char*)cmd, "BTS stop")==0) {
+	    *handled = TRUE;
+	    return Stop(io);
+  }else if (UTIL1_strcmp((char*)cmd, "BTS verbose")==0) {
+	    *handled = TRUE;
+	    return Toggle_Verbose();
+  } /* else if (UTIL1_strncmp((char*)cmd, "FAT1 copy", sizeof("FAT1 copy")-1)==0) {
     *handled = TRUE;
     return CopyCmd(cmd+sizeof("FAT1"), io);
   } else if (UTIL1_strncmp((char*)cmd, "FAT1 delete", sizeof("FAT1 delete")-1)==0) {
@@ -395,7 +399,7 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io) {
   CLS1_SendHelpStr((unsigned char*)"  start", (const unsigned char*)"start battery capacity test\r\n", io->stdOut);
   CLS1_SendHelpStr((unsigned char*)"  stop", (const unsigned char*)"stop test and save data\r\n", io->stdOut);
   CLS1_SendHelpStr((unsigned char*)"  break", (const unsigned char*)"stop test and discard data\r\n", io->stdOut);
-  CLS1_SendHelpStr((unsigned char*)"  verbose", (const unsigned char*)"print log to shell\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  verbose", (const unsigned char*)"toggle print log to shell\r\n", io->stdOut);
   return ERR_OK;
 }
 
@@ -422,6 +426,8 @@ static uint8_t PrintStatus(const CLS1_StdIOType *io) {
 
 //loads the current
 static void Load_Current(int newCurrent){
+    /*scale the current setting to a percentage(0 to 1), current sense amplifier is measureing voltage across a .003ohm resisitor with a gain of 100
+        Vref is 3.3V, therefore the maximum current that can be read is 3.3V/(.003ohm*100) = 11Amps*/
 	PID_perCurrentSet = (float)newCurrent / maxCurrSense;	//newCurrent in mA divided by the maximum current the current sense adc channels can read
 }
 
@@ -443,6 +449,12 @@ static void State_Machine(const CLS1_StdIOType *io){
 	}else if (doneReason == OVER_TEMP){
 		CLS1_SendStr((unsigned char*)"cycle ended due to over temperature, aborting\r\n", io->stdOut);
 		nextState = IDLE_MODE;
+	}else if (doneReason == USER_COMMAND){
+		//CLS1_SendStr((unsigned char*)"cycle ended due to user command, aborting\r\n", io->stdOut);
+		nextState = IDLE_MODE;
+	}else if (doneReason == OVER_CURRENT){
+		CLS1_SendStr((unsigned char*)"cycle ended due to over-current condition, aborting\r\n", io->stdOut);
+		nextState = IDLE_MODE;
 	}
 
 	if (doneReason <= DROPOUT){
@@ -455,25 +467,39 @@ static void State_Machine(const CLS1_StdIOType *io){
 	doneReason = 0;		//reset done reason
 }
 
-static void Cycle_Done(){
-	state = CYCLE_DONE;
+//command for starting charge/discharge program
+static uint8_t Start(const CLS1_StdIOType *io){
+
+	if (state == IDLE_MODE){	//if in idle mode
+		state = CYCLE_DONE;			//set state to cycle done, used as flag to run Load_Settings function
+		nextState = firstState;		//initialize nextState, Load_Settings will load this into state
+		cyclesLeft = maxCycles;		//load cyclesLeft with maxCycles
+		CLS1_SendStr((unsigned char*)"BTS starting\r\n", io->stdOut);
+	}else
+		CLS1_SendStr((unsigned char*)"already started\r\n", io->stdOut);
+
+	return ERR_OK;
 }
 
-static void Start(){
+//command for stopping
+static uint8_t Stop(const CLS1_StdIOType *io){
 
-	if (cyclesLeft == 0){			//if this is the first start
-		cyclesLeft = maxCycles - 1;		//set the max number of cycles to do
-		state = firstState;
-	}else{
-		cyclesLeft = cyclesLeft - 1;
-		state = nextState;
-	}
+	if (state >= INT_RES_TEST){
+		state = CYCLE_DONE;
+		doneReason = USER_COMMAND;
+	}else
+		CLS1_SendStr((unsigned char*)"already stopped\r\n", io->stdOut);
 
-	//load the new current value depending on the state
-	if (state == CHG_MODE){
-		Load_Current(chgCurrSet);
-	}else if (state == DIS_MODE){
-		Load_Current(disCurrSet);
-	}
+	return ERR_OK;
+}
 
+//command for stopping
+static uint8_t Toggle_Verbose(){
+
+	if (verbose == 1)
+		verbose = 0;
+	else
+		verbose = 1;
+
+	return ERR_OK;
 }
