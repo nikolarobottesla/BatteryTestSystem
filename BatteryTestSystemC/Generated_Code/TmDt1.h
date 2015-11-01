@@ -4,10 +4,10 @@
 **     Project     : BatteryTestSystemC
 **     Processor   : MKL25Z128VLK4
 **     Component   : GenericTimeDate
-**     Version     : Component 01.020, Driver 01.00, CPU db: 3.00.000
-**     Repository  : mcuoneclipse
+**     Version     : Component 01.027, Driver 01.00, CPU db: 3.00.000
+**     Repository  : My Components
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-26, 01:31, # CodeGen: 5
+**     Date/Time   : 2015-11-01, 08:35, # CodeGen: 38
 **     Abstract    :
 **         Software date/time module.
 **     Settings    :
@@ -26,6 +26,8 @@
 **     Contents    :
 **         AddTick      - void TmDt1_AddTick(void);
 **         AddTicks     - void TmDt1_AddTicks(uint16_t nofTicks);
+**         TicksToTime  - uint8_t TmDt1_TicksToTime(uint32_t ticks, TIMEREC *Time);
+**         TimeToTicks  - uint8_t TmDt1_TimeToTicks(TIMEREC *Time, uint32_t *ticks);
 **         SetTime      - uint8_t TmDt1_SetTime(uint8_t Hour, uint8_t Min, uint8_t Sec, uint8_t Sec100);
 **         GetTime      - uint8_t TmDt1_GetTime(TIMEREC *Time);
 **         SetDate      - uint8_t TmDt1_SetDate(uint16_t Year, uint8_t Month, uint8_t Day);
@@ -214,6 +216,37 @@ void TmDt1_AddTicks(uint16_t nofTicks);
 **         NAME            - DESCRIPTION
 **         nofTicks        - Number of ticks to be added
 **     Returns     : Nothing
+** ===================================================================
+*/
+
+uint8_t TmDt1_TicksToTime(uint32_t ticks, TIMEREC *Time);
+/*
+** ===================================================================
+**     Method      :  TmDt1_TicksToTime (component GenericTimeDate)
+**     Description :
+**         Transforms ticks into time information
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**         ticks           - 
+**       * Time            - Pointer where to store the time
+**                           information
+**     Returns     :
+**         ---             - Error code
+** ===================================================================
+*/
+
+uint8_t TmDt1_TimeToTicks(TIMEREC *Time, uint32_t *ticks);
+/*
+** ===================================================================
+**     Method      :  TmDt1_TimeToTicks (component GenericTimeDate)
+**     Description :
+**         Transforms time information into ticks
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**       * Time            - Pointer where to time information
+**       * ticks           - Pointer to where to store the ticks
+**     Returns     :
+**         ---             - Error code
 ** ===================================================================
 */
 

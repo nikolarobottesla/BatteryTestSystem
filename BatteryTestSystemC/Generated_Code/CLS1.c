@@ -5,9 +5,9 @@
 **     Processor   : MKL25Z128VLK4
 **     Component   : Shell
 **     Version     : Component 01.073, Driver 01.00, CPU db: 3.00.000
-**     Repository  : mcuoneclipse
+**     Repository  : My Components
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-10-09, 17:32, # CodeGen: 31
+**     Date/Time   : 2015-11-01, 08:35, # CodeGen: 38
 **     Abstract    :
 **
 **     Settings    :
@@ -366,6 +366,10 @@ bool CLS1_IsHistoryCharacter(uint8_t ch, uint8_t *cmdBuf, size_t cmdBufIdx, bool
     /* \todo: handle TAB and SHIFT-TAB */
   }
 #endif
+#else
+  (void)ch; /* not used */
+  (void)cmdBuf; /* not used */
+  (void)cmdBufIdx; /* not used */
 #endif
   return FALSE;
 }

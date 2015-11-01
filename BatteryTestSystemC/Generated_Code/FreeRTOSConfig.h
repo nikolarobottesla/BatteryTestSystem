@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.0 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V8.2.2 - Copyright (C) 2015 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -72,35 +72,42 @@
 
 /* -------------------------------------------------------------------- */
 /* Macros to identify the compiler used: */
-#define configCOMPILER_ARM_GCC               1 /* GNU ARM gcc compiler */
-#define configCOMPILER_ARM_IAR               2 /* IAR ARM compiler */
-#define configCOMPILER_ARM_FSL               3 /* Legacy Freescale ARM compiler */
-#define configCOMPILER_ARM_KEIL              4 /* ARM/Keil compiler */
-#define configCOMPILER_S08_FSL               5 /* Freescale HCS08 compiler */
-#define configCOMPILER_S12_FSL               6 /* Freescale HCS12(X) compiler */
-#define configCOMPILER_CF1_FSL               7 /* Freescale ColdFire V1 compiler */
-#define configCOMPILER_CF2_FSL               8 /* Freescale ColdFire V2 compiler */
-#define configCOMPILER_DSC_FSL               9 /* Freescale DSC compiler */
+#define configCOMPILER_ARM_GCC                    1 /* GNU ARM gcc compiler */
+#define configCOMPILER_ARM_IAR                    2 /* IAR ARM compiler */
+#define configCOMPILER_ARM_FSL                    3 /* Legacy Freescale ARM compiler */
+#define configCOMPILER_ARM_KEIL                   4 /* ARM/Keil compiler */
+#define configCOMPILER_S08_FSL                    5 /* Freescale HCS08 compiler */
+#define configCOMPILER_S12_FSL                    6 /* Freescale HCS12(X) compiler */
+#define configCOMPILER_CF1_FSL                    7 /* Freescale ColdFire V1 compiler */
+#define configCOMPILER_CF2_FSL                    8 /* Freescale ColdFire V2 compiler */
+#define configCOMPILER_DSC_FSL                    9 /* Freescale DSC compiler */
 
 #define configCOMPILER                            configCOMPILER_ARM_GCC
 /* -------------------------------------------------------------------- */
 /* CPU family identification */
-#define configCPU_FAMILY_S08                 1  /* S08 core */
-#define configCPU_FAMILY_S12                 2  /* S12(X) core */
-#define configCPU_FAMILY_CF1                 3  /* ColdFire V1 core */
-#define configCPU_FAMILY_CF2                 4  /* ColdFire V2 core */
-#define configCPU_FAMILY_DSC                 5  /* 56800/DSC */
-#define configCPU_FAMILY_ARM_M0P             6  /* ARM Cortex-M0+ */
-#define configCPU_FAMILY_ARM_M4              7  /* ARM Cortex-M4 */
-#define configCPU_FAMILY_ARM_M4F             8  /* ARM Cortex-M4F (with floating point unit) */
-#define configCPU_FAMILY_ARM_M7              9  /* ARM Cortex-M7 */
-#define configCPU_FAMILY_ARM_M7F             10  /* ARM Cortex-M7F (with floating point unit) */
+#define configCPU_FAMILY_S08                      1   /* S08 core */
+#define configCPU_FAMILY_S12                      2   /* S12(X) core */
+#define configCPU_FAMILY_CF1                      3   /* ColdFire V1 core */
+#define configCPU_FAMILY_CF2                      4   /* ColdFire V2 core */
+#define configCPU_FAMILY_DSC                      5   /* 56800/DSC */
+#define configCPU_FAMILY_ARM_M0P                  6   /* ARM Cortex-M0+ */
+#define configCPU_FAMILY_ARM_M4                   7   /* ARM Cortex-M4 */
+#define configCPU_FAMILY_ARM_M4F                  8   /* ARM Cortex-M4F (with floating point unit) */
+#define configCPU_FAMILY_ARM_M7                   9   /* ARM Cortex-M7 */
+#define configCPU_FAMILY_ARM_M7F                  10  /* ARM Cortex-M7F (with floating point unit) */
 /* Macros to identify set of core families */
-#define configCPU_FAMILY_IS_ARM_M7(fam)      (((fam)==configCPU_FAMILY_ARM_M7)  || ((fam)==configCPU_FAMILY_ARM_M7F))
-#define configCPU_FAMILY_IS_ARM_M4(fam)      (((fam)==configCPU_FAMILY_ARM_M4)  || ((fam)==configCPU_FAMILY_ARM_M4F))
-#define configCPU_FAMILY_IS_ARM(fam)         (((fam)==configCPU_FAMILY_ARM_M0P) || configCPU_FAMILY_IS_ARM_M4(fam) || configCPU_FAMILY_IS_ARM_M7(fam))
+#define configCPU_FAMILY_IS_ARM_M7(fam)           (((fam)==configCPU_FAMILY_ARM_M7)  || ((fam)==configCPU_FAMILY_ARM_M7F))
+#define configCPU_FAMILY_IS_ARM_M4(fam)           (((fam)==configCPU_FAMILY_ARM_M4)  || ((fam)==configCPU_FAMILY_ARM_M4F))
+#define configCPU_FAMILY_IS_ARM(fam)              (((fam)==configCPU_FAMILY_ARM_M0P) || configCPU_FAMILY_IS_ARM_M4(fam) || configCPU_FAMILY_IS_ARM_M7(fam))
 
 #define configCPU_FAMILY                          configCPU_FAMILY_ARM_M0P
+
+/*-----------------------------------------------------------
+ * GDB backtrace handler support
+ * See http://interactive.freertos.org/entries/23468301-Tasks-backtrace-switcher-viewer-snippet-for-debugger-gcc-gdb-ARM-Cortex-M3-MPU-port-Eclipse-support-
+ *----------------------------------------------------------*/
+#define configGDB_HELPER                          (0 && configCPU_FAMILY_IS_ARM(configCPU_FAMILY) && (configCOMPILER==configCOMPILER_ARM_GCC)) /* 1: enable special GDB stack backtrace debug helper; 0: disabled */
+
 /*-----------------------------------------------------------
  * Application specific definitions.
  *
@@ -149,6 +156,7 @@
 #if configUSE_HEAP_SECTION_NAME
 #define configHEAP_SECTION_NAME_STRING            ".m_data_20000000" /* heap section name (use e.g. ".m_data_20000000" for gcc and "m_data_20000000" for IAR). Check your linker file for the name used. */
 #endif
+#define configAPPLICATION_ALLOCATED_HEAP          0 /* set to one if application is defining heap ucHeap[] variable, 0 otherwise */
 /*----------------------------------------------------------*/
 #define configMAX_TASK_NAME_LEN                   12 /* task name length in bytes */
 #define configUSE_TRACE_FACILITY                  1 /* 1: include additional structure members and functions to assist with execution visualization and tracing, 0: no runtime stats/trace */
@@ -169,6 +177,7 @@
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP     2 /* number of ticks must be larger than this to enter tickless idle mode */
 #define configUSE_TICKLESS_IDLE_DECISION_HOOK     0 /* set to 1 to enable application hook, zero otherwise */
 #define configUSE_TICKLESS_IDLE_DECISION_HOOK_NAME xEnterTicklessIdle /* function name of decision hook */
+#define configNUM_THREAD_LOCAL_STORAGE_POINTERS   0 /* number of tread local storage pointers, 0 to disable functionality */
 
 #define configMAX_PRIORITIES                      ((unsigned portBASE_TYPE)6)
 #define configMAX_CO_ROUTINE_PRIORITIES           2
@@ -199,7 +208,6 @@
 #define INCLUDE_xTaskGetIdleTaskHandle            0
 #define INCLUDE_eTaskGetState                     0
 #define INCLUDE_pcTaskGetTaskName                 0
-
 /* -------------------------------------------------------------------- */
 /* Cortex-M specific definitions. */
 #if configCPU_FAMILY_IS_ARM_M4(configCPU_FAMILY)

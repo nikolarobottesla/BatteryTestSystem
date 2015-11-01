@@ -4,10 +4,10 @@
 **     Project     : BatteryTestSystemC
 **     Processor   : MKL25Z128VLK4
 **     Component   : LED
-**     Version     : Component 01.063, Driver 01.00, CPU db: 3.00.000
-**     Repository  : mcuoneclipse
+**     Version     : Component 01.066, Driver 01.00, CPU db: 3.00.000
+**     Repository  : My Components
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-10-14, 20:34, # CodeGen: 33
+**     Date/Time   : 2015-11-01, 08:35, # CodeGen: 38
 **     Abstract    :
 **          This component implements a universal driver for a single LED.
 **     Settings    :
@@ -25,12 +25,12 @@
 **         On         - void LEDR_On(void);
 **         Off        - void LEDR_Off(void);
 **         Neg        - void LEDR_Neg(void);
-**         Get        - byte LEDR_Get(void);
-**         Put        - void LEDR_Put(byte val);
-**         SetRatio16 - void LEDR_SetRatio16(word ratio);
+**         Get        - uint8_t LEDR_Get(void);
+**         Put        - void LEDR_Put(uint8_t val);
+**         SetRatio16 - void LEDR_SetRatio16(uint16_t ratio);
 **
 **     License   : Open Source (LGPL)
-**     Copyright : Erich Styger, 2013, all rights reserved.
+**     Copyright : Erich Styger, 2013-2015, all rights reserved.
 **     Web       : www.mcuoneclipse.com
 **     This an open source software implementing a driver using Processor Expert.
 **     This is a free software and is opened for education, research and commercial developments under license policy of following terms:
@@ -153,7 +153,7 @@ void LEDR_Deinit(void);
 ** ===================================================================
 */
 
-void LEDR_SetRatio16(word ratio);
+void LEDR_SetRatio16(uint16_t ratio);
 /*
 ** ===================================================================
 **     Method      :  LEDR_SetRatio16 (component LED)

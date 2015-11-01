@@ -109,7 +109,7 @@ static portTASK_FUNCTION(control, pvParameters) {
 	  }
 
 	  if ( doneReason > 0 ){
-		  State_Machine();}		//choose what to do next
+		  State_Machine(CLS1_GetStdio());}		//choose what to do next
 
 	  FRTOS1_vTaskDelay(5000/portTICK_RATE_MS);
   }

@@ -4,10 +4,10 @@
 **     Project     : BatteryTestSystemC
 **     Processor   : MKL25Z128VLK4
 **     Component   : LED
-**     Version     : Component 01.063, Driver 01.00, CPU db: 3.00.000
-**     Repository  : mcuoneclipse
+**     Version     : Component 01.066, Driver 01.00, CPU db: 3.00.000
+**     Repository  : My Components
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-26, 01:31, # CodeGen: 5
+**     Date/Time   : 2015-11-01, 08:35, # CodeGen: 38
 **     Abstract    :
 **          This component implements a universal driver for a single LED.
 **     Settings    :
@@ -25,12 +25,12 @@
 **         On         - void LEDG_On(void);
 **         Off        - void LEDG_Off(void);
 **         Neg        - void LEDG_Neg(void);
-**         Get        - byte LEDG_Get(void);
-**         Put        - void LEDG_Put(byte val);
-**         SetRatio16 - void LEDG_SetRatio16(word ratio);
+**         Get        - uint8_t LEDG_Get(void);
+**         Put        - void LEDG_Put(uint8_t val);
+**         SetRatio16 - void LEDG_SetRatio16(uint16_t ratio);
 **
 **     License   : Open Source (LGPL)
-**     Copyright : Erich Styger, 2013, all rights reserved.
+**     Copyright : Erich Styger, 2013-2015, all rights reserved.
 **     Web       : www.mcuoneclipse.com
 **     This an open source software implementing a driver using Processor Expert.
 **     This is a free software and is opened for education, research and commercial developments under license policy of following terms:
@@ -62,6 +62,13 @@
 **     Returns     : Nothing
 ** ===================================================================
 */
+/*
+void LEDG_On(void)
+{
+  *** This method is implemented as macro in the header file
+}
+*/
+
 /*
 ** ===================================================================
 **     Method      :  LEDG_Off (component LED)
@@ -105,7 +112,7 @@ void LEDG_Neg(void)
 ** ===================================================================
 */
 /*
-byte LEDG_Get(void)
+uint8_t LEDG_Get(void)
 {
   *** This method is implemented as macro in the header file
 }
@@ -140,7 +147,7 @@ void LEDG_Init(void)
 ** ===================================================================
 */
 /*
-void LEDG_Put(byte val)
+void LEDG_Put(uint8_t val)
 {
   *** This method is implemented as macro in the header file
 }
@@ -173,7 +180,7 @@ void LEDG_Deinit(void)
 **     Returns     : Nothing
 ** ===================================================================
 */
-void LEDG_SetRatio16(word ratio)
+void LEDG_SetRatio16(uint16_t ratio)
 {
   /* on/off LED: binary on or off */
   if (ratio<(0xffff/2)) {

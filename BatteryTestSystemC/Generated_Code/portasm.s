@@ -1,6 +1,6 @@
 /* file is intentionally empty as not needed for this GNU gcc FreeRTOS port */
 /*
-    FreeRTOS V8.2.0 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V8.2.2 - Copyright (C) 2015 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.

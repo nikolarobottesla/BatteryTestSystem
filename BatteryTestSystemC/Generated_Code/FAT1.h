@@ -4,10 +4,10 @@
 **     Project     : BatteryTestSystemC
 **     Processor   : MKL25Z128VLK4
 **     Component   : FAT_FileSystem
-**     Version     : Component 01.167, Driver 01.00, CPU db: 3.00.000
-**     Repository  : mcuoneclipse
+**     Version     : Component 01.168, Driver 01.00, CPU db: 3.00.000
+**     Repository  : My Components
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-26, 01:31, # CodeGen: 5
+**     Date/Time   : 2015-11-01, 08:35, # CodeGen: 38
 **     Abstract    :
 **
 **     Settings    :
@@ -94,7 +94,7 @@
 **         Benchmark         - byte FAT1_Benchmark(const %@Shell@'ModuleName'%.StdIOType *io);
 **
 **     License   :  Open Source (LGPL)
-**     Copyright : (c) Copyright Erich Styger, 2012-2014, all rights reserved.
+**     Copyright : (c) Copyright Erich Styger, 2012-2015, all rights reserved.
 **     Web       : www.mcuoneclipse.com
 **     FatFS: Copyright (C) 2014, ChaN, all right reserved. (see copyright notice and license in the FatFS implementation).
 **     This an open source software implementing an interface to the ChaN FatFS using Processor Expert.

@@ -380,10 +380,7 @@ PE_DEBUGHALT();
         </boolgroup>
         <boolgroup name="PWM" v="Disabled" />
       </group>
-      <boolgroup name="Shell" v="Enabled">
-        <Shell v="CLS1" />
-        <Utility v="UTIL1" />
-      </boolgroup>
+      <boolgroup name="Shell" v="Disabled" />
     </Properties>
     <Methods>
       <Init v="generate code" />
@@ -394,7 +391,7 @@ PE_DEBUGHALT();
       <Get v="generate code" />
       <Put v="generate code" />
       <SetRatio16 v="generate code" />
-      <ParseCommand v="generate code" />
+      <ParseCommand v="don&amp;apos;t generate code" />
     </Methods>
     <Events>
       <EmptySection_DummyValue />

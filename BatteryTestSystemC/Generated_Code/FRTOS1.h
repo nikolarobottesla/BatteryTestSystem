@@ -4,24 +4,26 @@
 **     Project     : BatteryTestSystemC
 **     Processor   : MKL25Z128VLK4
 **     Component   : FreeRTOS
-**     Version     : Component 01.414, Driver 01.00, CPU db: 3.00.000
-**     Repository  : mcuoneclipse
+**     Version     : Component 01.438, Driver 01.00, CPU db: 3.00.000
+**     Repository  : My Components
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-26, 01:31, # CodeGen: 5
+**     Date/Time   : 2015-11-01, 08:35, # CodeGen: 38
 **     Abstract    :
 **          This component implements the FreeRTOS Realtime Operating System
 **     Settings    :
 **          Component name                                 : FRTOS1
-**          RTOS Version                                   : V8.2.0
+**          RTOS Version                                   : V8.2.2
+**          Kinetis SDK                                    : Disabled
 **          Custom Port                                    : Custom port settings
 **            Compiler                                     : automatic
 **            Static Sources                               : Disabled
 **            Custom portBASE_TYPE                         : Disabled
-**          Kinetis SDK                                    : Disabled
 **          Classic CodeWarrior                            : no
 **          Disabled Interrupts in Startup                 : yes
 **          configASSERT defined                           : yes
+**          Enable GDB Debug Helper                        : no
 **          Application Task Tags                          : no
+**          Thread Local Storage Pointers                  : 0
 **          Use Trace Facility                             : yes
 **          Trace Hooks                                    : Disabled
 **          Collect Runtime Statistics                     : Disabled
@@ -29,7 +31,7 @@
 **            ColdFire V1                                  : Disabled
 **            ColdFire V2                                  : Disabled
 **            Kinetis                                      : Enabled
-**              ARM Family                                 : Cortex M0+
+**              ARM Family                                 : Cortex-M0+
 **              Floating Point Support                     : no
 **              Max SysCall Interrupt Priority             : 1
 **              RTOS Interrupt Priority                    : 3
@@ -63,6 +65,7 @@
 **            Use Recursive Mutexes                        : yes
 **          Timers                                         : Disabled
 **          Memory                                         : Settings for the memory and heap allocation
+**            Application allocated Heap                   : no
 **            Memory Allocation Scheme                     : Scheme 2
 **            User Heap Section                            : Disabled
 **            Total Heap Size                              : 8192
@@ -76,100 +79,105 @@
 **            Shell                                        : CLS1
 **          Utility                                        : UTIL1
 **     Contents    :
-**         xTaskCreate                    - portBASE_TYPE FRTOS1_xTaskCreate(pdTASK_CODE pvTaskCode, const portCHAR *...
-**         vTaskStartScheduler            - void FRTOS1_vTaskStartScheduler(void);
-**         vTaskSuspend                   - void FRTOS1_vTaskSuspend(xTaskHandle pxTaskToSuspend);
-**         vTaskSuspendAll                - void FRTOS1_vTaskSuspendAll(void);
-**         vTaskResume                    - void FRTOS1_vTaskResume(xTaskHandle pxTaskToResume);
-**         xTaskResumeAll                 - portBASE_TYPE FRTOS1_xTaskResumeAll(void);
-**         xTaskResumeFromISR             - portBASE_TYPE FRTOS1_xTaskResumeFromISR(xTaskHandle pxTaskToResume);
-**         taskYIELD                      - void FRTOS1_taskYIELD(void);
-**         taskENTER_CRITICAL             - void FRTOS1_taskENTER_CRITICAL(void);
-**         taskEXIT_CRITICAL              - void FRTOS1_taskEXIT_CRITICAL(void);
-**         taskDISABLE_INTERRUPTS         - void FRTOS1_taskDISABLE_INTERRUPTS(void);
-**         taskENABLE_INTERRUPTS          - void FRTOS1_taskENABLE_INTERRUPTS(void);
-**         vTaskDelay                     - void FRTOS1_vTaskDelay(portTickType xTicksToDelay);
-**         vTaskDelayUntil                - void FRTOS1_vTaskDelayUntil(portTickType *pxPreviousWakeTime, portTickType...
-**         uxTaskPriorityGet              - unsigned_portBASE_TYPE FRTOS1_uxTaskPriorityGet(xTaskHandle pxTask);
-**         vTaskPrioritySet               - void FRTOS1_vTaskPrioritySet(xTaskHandle pxTask, unsigned_portBASE_TYPE...
-**         xTaskGetTickCount              - portTickType FRTOS1_xTaskGetTickCount(void);
-**         xTaskGetTickCountFromISR       - portTickType FRTOS1_xTaskGetTickCountFromISR(void);
-**         xSemaphoreCreateRecursiveMutex - xSemaphoreHandle FRTOS1_xSemaphoreCreateRecursiveMutex(void);
-**         xSemaphoreTakeRecursive        - bool FRTOS1_xSemaphoreTakeRecursive(xSemaphoreHandle xMutex, portTickType...
-**         xSemaphoreGiveRecursive        - bool FRTOS1_xSemaphoreGiveRecursive(xSemaphoreHandle xMutex);
-**         xSemaphoreCreateMutex          - xSemaphoreHandle FRTOS1_xSemaphoreCreateMutex(void);
-**         xSemaphoreTake                 - bool FRTOS1_xSemaphoreTake(xSemaphoreHandle xMutex, portTickType xBlockTime);
-**         xSemaphoreGive                 - bool FRTOS1_xSemaphoreGive(xSemaphoreHandle xMutex);
-**         vSemaphoreCreateBinary         - void FRTOS1_vSemaphoreCreateBinary(xSemaphoreHandle xSemaphore);
-**         xSemaphoreCreateCounting       - xSemaphoreHandle FRTOS1_xSemaphoreCreateCounting(unsigned_portBASE_TYPE...
-**         xSemaphoreGiveFromISR          - bool FRTOS1_xSemaphoreGiveFromISR(xSemaphoreHandle xSemaphore,...
-**         xSemaphoreTakeFromISR          - bool FRTOS1_xSemaphoreTakeFromISR(xSemaphoreHandle xSemaphore,...
-**         vSemaphoreDelete               - void FRTOS1_vSemaphoreDelete(xSemaphoreHandle xSemaphore);
-**         xSemaphoreGetMutexHolder       - void* FRTOS1_xSemaphoreGetMutexHolder(xSemaphoreHandle xSemaphore);
-**         pvPortMalloc                   - pVoid FRTOS1_pvPortMalloc(size_t xWantedSize);
-**         vPortFree                      - void FRTOS1_vPortFree(void *pv);
-**         xPortGetFreeHeapSize           - Tsize_t FRTOS1_xPortGetFreeHeapSize(void);
-**         xTaskGetSchedulerState         - portBASE_TYPE FRTOS1_xTaskGetSchedulerState(void);
-**         vTaskList                      - void FRTOS1_vTaskList(signed portCHAR *pcWriteBuffer, size_t bufSize);
-**         uxTaskGetStackHighWaterMark    - unsigned_portBASE_TYPE FRTOS1_uxTaskGetStackHighWaterMark(xTaskHandle xTask);
-**         uxTaskGetNumberOfTasks         - unsigned_portBASE_TYPE FRTOS1_uxTaskGetNumberOfTasks(void);
-**         uxQueueMessagesWaiting         - unsigned_portBASE_TYPE FRTOS1_uxQueueMessagesWaiting(xQueueHandle xQueue);
-**         uxQueueMessagesWaitingfromISR  - unsigned_portBASE_TYPE FRTOS1_uxQueueMessagesWaitingfromISR(xQueueHandle...
-**         xQueueCreate                   - xQueueHandle FRTOS1_xQueueCreate(unsigned_portBASE_TYPE uxQueueLength,...
-**         vQueueDelete                   - void FRTOS1_vQueueDelete(xQueueHandle pxQueueToDelete);
-**         xQueueReset                    - portBASE_TYPE FRTOS1_xQueueReset(xQueueHandle xQueue);
-**         xQueueSendToBack               - portBASE_TYPE FRTOS1_xQueueSendToBack(xQueueHandle xQueue, const void...
-**         xQueueSendToFront              - portBASE_TYPE FRTOS1_xQueueSendToFront(xQueueHandle xQueue, const void...
-**         xQueueReceive                  - portBASE_TYPE FRTOS1_xQueueReceive(xQueueHandle xQueue, void *pvBuffer,...
-**         xQueueOverwrite                - portBASE_TYPE FRTOS1_xQueueOverwrite(xQueueHandle xQueue, const void...
-**         xQueueOverwriteFromISR         - portBASE_TYPE FRTOS1_xQueueOverwriteFromISR(xQueueHandle xQueue, const void...
-**         xQueuePeek                     - portBASE_TYPE FRTOS1_xQueuePeek(xQueueHandle xQueue, void *pvBuffer,...
-**         xQueuePeekFromISR              - portBASE_TYPE FRTOS1_xQueuePeekFromISR(xQueueHandle xQueue, void *pvBuffer,...
-**         xQueueSendToBackFromISR        - portBASE_TYPE FRTOS1_xQueueSendToBackFromISR(xQueueHandle xQueue, const void...
-**         xQueueSendToFrontFromISR       - portBASE_TYPE FRTOS1_xQueueSendToFrontFromISR(xQueueHandle xQueue, const void...
-**         xQueueReceiveFromISR           - portBASE_TYPE FRTOS1_xQueueReceiveFromISR(xQueueHandle xQueue, void...
-**         vQueueAddToRegistry            - void FRTOS1_vQueueAddToRegistry(xQueueHandle xQueue, char *pcQueueName);
-**         vQueueUnregisterQueue          - void FRTOS1_vQueueUnregisterQueue(xQueueHandle xQueue);
-**         xQueueIsQueueFullFromISR       - portBASE_TYPE FRTOS1_xQueueIsQueueFullFromISR(xQueueHandle xQueue);
-**         xQueueIsQueueEmptyFromISR      - portBASE_TYPE FRTOS1_xQueueIsQueueEmptyFromISR(xQueueHandle xQueue);
-**         xEventGroupCreate              - EventGroupHandle_t FRTOS1_xEventGroupCreate(void);
-**         xEventGroupWaitBits            - byte FRTOS1_xEventGroupWaitBits(const EventGroupHandle_t xEventGroup, const...
-**         xEventGroupSetBits             - EventBits_t FRTOS1_xEventGroupSetBits(EventGroupHandle_t xEventGroup, const...
-**         xEventGroupSetBitsFromISR      - EventBits_t FRTOS1_xEventGroupSetBitsFromISR(EventGroupHandle_t xEventGroup,...
-**         xEventGroupClearBits           - EventBits_t FRTOS1_xEventGroupClearBits(EventGroupHandle_t xEventGroup, const...
-**         xEventGroupClearBitsFromISR    - EventBits_t FRTOS1_xEventGroupClearBitsFromISR(EventGroupHandle_t...
-**         xEventGroupGetBits             - EventBits_t FRTOS1_xEventGroupGetBits(EventGroupHandle_t xEventGroup);
-**         xEventGroupGetBitsFromISR      - EventBits_t FRTOS1_xEventGroupGetBitsFromISR(EventGroupHandle_t xEventGroup);
-**         xEventGroupSync                - EventBits_t FRTOS1_xEventGroupSync(EventGroupHandle_t xEventGroup, const...
-**         xTimerCreate                   - TimerHandle_t FRTOS1_xTimerCreate(const char * const pcTimerName, const...
-**         xTimerIsTimerActive            - BaseType_t FRTOS1_xTimerIsTimerActive(TimerHandle_t xTimer);
-**         xTimerStart                    - BaseType_t FRTOS1_xTimerStart(TimerHandle_t xTimer, TickType_t xBlockTime);
-**         xTimerStop                     - BaseType_t FRTOS1_xTimerStop(TimerHandle_t xTimer, TickType_t xBlockTime);
-**         xTimerChangePeriod             - BaseType_t FRTOS1_xTimerChangePeriod(TimerHandle_t xTimer, TickType_t...
-**         xTimerDelete                   - BaseType_t FRTOS1_xTimerDelete(TickType_t xTimer, TickType_t xBlockTime);
-**         xTimerReset                    - BaseType_t FRTOS1_xTimerReset(TimerHandle_t xTimer, TickType_t xBlockTime);
-**         xTimerStartFromISR             - BaseType_t FRTOS1_xTimerStartFromISR(TimerHandle_t xTimer, BaseType_t...
-**         xTimerStopFromISR              - BaseType_t FRTOS1_xTimerStopFromISR(TimerHandle_t xTimer, BaseType_t...
-**         xTimerChangePeriodFromISR      - BaseType_t FRTOS1_xTimerChangePeriodFromISR(TimerHandle_t xTimer, TickType_t...
-**         xTimerResetFromISR             - BaseType_t FRTOS1_xTimerResetFromISR(TimerHandle_t xTimer, BaseType_t...
-**         pvTimerGetTimerID              - void* FRTOS1_pvTimerGetTimerID(TimerHandle_t xTimer);
-**         xTimerGetTimerDaemonTaskHandle - TaskHandle_t FRTOS1_xTimerGetTimerDaemonTaskHandle(void);
-**         pcTimerGetTimerName            - char* FRTOS1_pcTimerGetTimerName(TimerHandle_t xTimer);
-**         xTimerPendFunctionCall         - BaseType_t FRTOS1_xTimerPendFunctionCall(PendedFunction_t xFunctionToPend,...
-**         xTimerPendFunctionCallFromISR  - BaseType_t FRTOS1_xTimerPendFunctionCallFromISR(PendedFunction_t...
-**         xTaskNotifyGive                - BaseType_t FRTOS1_xTaskNotifyGive(TaskHandle_t xTaskToNotify);
-**         vTaskNotifyGiveFromISR         - void FRTOS1_vTaskNotifyGiveFromISR(TaskHandle_t xTaskToNotify, BaseType_t...
-**         ulTaskNotifyTake               - uint32_t FRTOS1_ulTaskNotifyTake(BaseType_t xClearCountOnExit, TickType_t...
-**         xTaskNotify                    - BaseType_t FRTOS1_xTaskNotify(TaskHandle_t xTaskToNotify, uint32_t ulValue,...
-**         xTaskNotifyFromISR             - BaseType_t FRTOS1_xTaskNotifyFromISR(TaskHandle_t xTaskToNotify, uint32_t...
-**         xTaskNotifyWait                - BaseType_t FRTOS1_xTaskNotifyWait(uint32_t ulBitsToClearOnEntry, uint32_t...
-**         ParseCommand                   - byte FRTOS1_ParseCommand(const unsigned char *cmd, bool *handled, const...
-**         Init                           - void FRTOS1_Init(void);
+**         xTaskCreate                        - portBASE_TYPE FRTOS1_xTaskCreate(pdTASK_CODE pvTaskCode, const portCHAR *...
+**         vTaskStartScheduler                - void FRTOS1_vTaskStartScheduler(void);
+**         vTaskSuspend                       - void FRTOS1_vTaskSuspend(xTaskHandle pxTaskToSuspend);
+**         vTaskSuspendAll                    - void FRTOS1_vTaskSuspendAll(void);
+**         vTaskResume                        - void FRTOS1_vTaskResume(xTaskHandle pxTaskToResume);
+**         xTaskResumeAll                     - portBASE_TYPE FRTOS1_xTaskResumeAll(void);
+**         xTaskResumeFromISR                 - portBASE_TYPE FRTOS1_xTaskResumeFromISR(xTaskHandle pxTaskToResume);
+**         taskYIELD                          - void FRTOS1_taskYIELD(void);
+**         taskENTER_CRITICAL                 - void FRTOS1_taskENTER_CRITICAL(void);
+**         taskEXIT_CRITICAL                  - void FRTOS1_taskEXIT_CRITICAL(void);
+**         taskDISABLE_INTERRUPTS             - void FRTOS1_taskDISABLE_INTERRUPTS(void);
+**         taskENABLE_INTERRUPTS              - void FRTOS1_taskENABLE_INTERRUPTS(void);
+**         vTaskDelay                         - void FRTOS1_vTaskDelay(portTickType xTicksToDelay);
+**         vTaskDelayUntil                    - void FRTOS1_vTaskDelayUntil(portTickType *pxPreviousWakeTime, portTickType...
+**         uxTaskPriorityGet                  - unsigned_portBASE_TYPE FRTOS1_uxTaskPriorityGet(xTaskHandle pxTask);
+**         vTaskPrioritySet                   - void FRTOS1_vTaskPrioritySet(xTaskHandle pxTask, unsigned_portBASE_TYPE...
+**         xTaskGetTickCount                  - portTickType FRTOS1_xTaskGetTickCount(void);
+**         xTaskGetTickCountFromISR           - portTickType FRTOS1_xTaskGetTickCountFromISR(void);
+**         xSemaphoreCreateRecursiveMutex     - xSemaphoreHandle FRTOS1_xSemaphoreCreateRecursiveMutex(void);
+**         xSemaphoreTakeRecursive            - bool FRTOS1_xSemaphoreTakeRecursive(xSemaphoreHandle xMutex, portTickType...
+**         xSemaphoreGiveRecursive            - bool FRTOS1_xSemaphoreGiveRecursive(xSemaphoreHandle xMutex);
+**         xSemaphoreCreateMutex              - xSemaphoreHandle FRTOS1_xSemaphoreCreateMutex(void);
+**         xSemaphoreTake                     - bool FRTOS1_xSemaphoreTake(xSemaphoreHandle xMutex, portTickType xBlockTime);
+**         xSemaphoreGive                     - bool FRTOS1_xSemaphoreGive(xSemaphoreHandle xMutex);
+**         vSemaphoreCreateBinary             - void FRTOS1_vSemaphoreCreateBinary(xSemaphoreHandle xSemaphore);
+**         xSemaphoreCreateBinary             - SemaphoreHandle_t FRTOS1_xSemaphoreCreateBinary(void);
+**         xSemaphoreCreateCounting           - xSemaphoreHandle FRTOS1_xSemaphoreCreateCounting(unsigned_portBASE_TYPE...
+**         xSemaphoreGiveFromISR              - bool FRTOS1_xSemaphoreGiveFromISR(xSemaphoreHandle xSemaphore,...
+**         xSemaphoreTakeFromISR              - bool FRTOS1_xSemaphoreTakeFromISR(xSemaphoreHandle xSemaphore,...
+**         vSemaphoreDelete                   - void FRTOS1_vSemaphoreDelete(xSemaphoreHandle xSemaphore);
+**         xSemaphoreGetMutexHolder           - void* FRTOS1_xSemaphoreGetMutexHolder(xSemaphoreHandle xSemaphore);
+**         pvPortMalloc                       - pVoid FRTOS1_pvPortMalloc(size_t xWantedSize);
+**         vPortFree                          - void FRTOS1_vPortFree(void *pv);
+**         xPortGetFreeHeapSize               - Tsize_t FRTOS1_xPortGetFreeHeapSize(void);
+**         xTaskGetSchedulerState             - portBASE_TYPE FRTOS1_xTaskGetSchedulerState(void);
+**         vTaskList                          - void FRTOS1_vTaskList(signed portCHAR *pcWriteBuffer, size_t bufSize);
+**         uxTaskGetStackHighWaterMark        - unsigned_portBASE_TYPE FRTOS1_uxTaskGetStackHighWaterMark(xTaskHandle xTask);
+**         uxTaskGetNumberOfTasks             - unsigned_portBASE_TYPE FRTOS1_uxTaskGetNumberOfTasks(void);
+**         uxQueueMessagesWaiting             - unsigned_portBASE_TYPE FRTOS1_uxQueueMessagesWaiting(xQueueHandle xQueue);
+**         uxQueueMessagesWaitingfromISR      - unsigned_portBASE_TYPE FRTOS1_uxQueueMessagesWaitingfromISR(xQueueHandle...
+**         xQueueCreate                       - xQueueHandle FRTOS1_xQueueCreate(unsigned_portBASE_TYPE uxQueueLength,...
+**         vQueueDelete                       - void FRTOS1_vQueueDelete(xQueueHandle pxQueueToDelete);
+**         xQueueReset                        - portBASE_TYPE FRTOS1_xQueueReset(xQueueHandle xQueue);
+**         xQueueSendToBack                   - portBASE_TYPE FRTOS1_xQueueSendToBack(xQueueHandle xQueue, const void...
+**         xQueueSendToFront                  - portBASE_TYPE FRTOS1_xQueueSendToFront(xQueueHandle xQueue, const void...
+**         xQueueReceive                      - portBASE_TYPE FRTOS1_xQueueReceive(xQueueHandle xQueue, void *pvBuffer,...
+**         xQueueOverwrite                    - portBASE_TYPE FRTOS1_xQueueOverwrite(xQueueHandle xQueue, const void...
+**         xQueueOverwriteFromISR             - portBASE_TYPE FRTOS1_xQueueOverwriteFromISR(xQueueHandle xQueue, const void...
+**         xQueuePeek                         - portBASE_TYPE FRTOS1_xQueuePeek(xQueueHandle xQueue, void *pvBuffer,...
+**         xQueuePeekFromISR                  - portBASE_TYPE FRTOS1_xQueuePeekFromISR(xQueueHandle xQueue, void *pvBuffer,...
+**         xQueueSendToBackFromISR            - portBASE_TYPE FRTOS1_xQueueSendToBackFromISR(xQueueHandle xQueue, const void...
+**         xQueueSendToFrontFromISR           - portBASE_TYPE FRTOS1_xQueueSendToFrontFromISR(xQueueHandle xQueue, const void...
+**         xQueueReceiveFromISR               - portBASE_TYPE FRTOS1_xQueueReceiveFromISR(xQueueHandle xQueue, void...
+**         vQueueAddToRegistry                - void FRTOS1_vQueueAddToRegistry(xQueueHandle xQueue, char *pcQueueName);
+**         vQueueUnregisterQueue              - void FRTOS1_vQueueUnregisterQueue(xQueueHandle xQueue);
+**         xQueueIsQueueFullFromISR           - portBASE_TYPE FRTOS1_xQueueIsQueueFullFromISR(xQueueHandle xQueue);
+**         xQueueIsQueueEmptyFromISR          - portBASE_TYPE FRTOS1_xQueueIsQueueEmptyFromISR(xQueueHandle xQueue);
+**         xEventGroupCreate                  - EventGroupHandle_t FRTOS1_xEventGroupCreate(void);
+**         xEventGroupWaitBits                - byte FRTOS1_xEventGroupWaitBits(const EventGroupHandle_t xEventGroup, const...
+**         xEventGroupSetBits                 - EventBits_t FRTOS1_xEventGroupSetBits(EventGroupHandle_t xEventGroup, const...
+**         xEventGroupSetBitsFromISR          - EventBits_t FRTOS1_xEventGroupSetBitsFromISR(EventGroupHandle_t xEventGroup,...
+**         xEventGroupClearBits               - EventBits_t FRTOS1_xEventGroupClearBits(EventGroupHandle_t xEventGroup, const...
+**         xEventGroupClearBitsFromISR        - EventBits_t FRTOS1_xEventGroupClearBitsFromISR(EventGroupHandle_t...
+**         xEventGroupGetBits                 - EventBits_t FRTOS1_xEventGroupGetBits(EventGroupHandle_t xEventGroup);
+**         xEventGroupGetBitsFromISR          - EventBits_t FRTOS1_xEventGroupGetBitsFromISR(EventGroupHandle_t xEventGroup);
+**         xEventGroupSync                    - EventBits_t FRTOS1_xEventGroupSync(EventGroupHandle_t xEventGroup, const...
+**         xTimerCreate                       - TimerHandle_t FRTOS1_xTimerCreate(const char * const pcTimerName, const...
+**         xTimerIsTimerActive                - BaseType_t FRTOS1_xTimerIsTimerActive(TimerHandle_t xTimer);
+**         xTimerStart                        - BaseType_t FRTOS1_xTimerStart(TimerHandle_t xTimer, TickType_t xBlockTime);
+**         xTimerStop                         - BaseType_t FRTOS1_xTimerStop(TimerHandle_t xTimer, TickType_t xBlockTime);
+**         xTimerChangePeriod                 - BaseType_t FRTOS1_xTimerChangePeriod(TimerHandle_t xTimer, TickType_t...
+**         xTimerDelete                       - BaseType_t FRTOS1_xTimerDelete(TickType_t xTimer, TickType_t xBlockTime);
+**         xTimerReset                        - BaseType_t FRTOS1_xTimerReset(TimerHandle_t xTimer, TickType_t xBlockTime);
+**         xTimerStartFromISR                 - BaseType_t FRTOS1_xTimerStartFromISR(TimerHandle_t xTimer, BaseType_t...
+**         xTimerStopFromISR                  - BaseType_t FRTOS1_xTimerStopFromISR(TimerHandle_t xTimer, BaseType_t...
+**         xTimerChangePeriodFromISR          - BaseType_t FRTOS1_xTimerChangePeriodFromISR(TimerHandle_t xTimer, TickType_t...
+**         xTimerResetFromISR                 - BaseType_t FRTOS1_xTimerResetFromISR(TimerHandle_t xTimer, BaseType_t...
+**         pvTimerGetTimerID                  - void* FRTOS1_pvTimerGetTimerID(TimerHandle_t xTimer);
+**         xTimerGetTimerDaemonTaskHandle     - TaskHandle_t FRTOS1_xTimerGetTimerDaemonTaskHandle(void);
+**         pcTimerGetTimerName                - char* FRTOS1_pcTimerGetTimerName(TimerHandle_t xTimer);
+**         xTimerPendFunctionCall             - BaseType_t FRTOS1_xTimerPendFunctionCall(PendedFunction_t xFunctionToPend,...
+**         xTimerPendFunctionCallFromISR      - BaseType_t FRTOS1_xTimerPendFunctionCallFromISR(PendedFunction_t...
+**         xTaskNotifyGive                    - BaseType_t FRTOS1_xTaskNotifyGive(TaskHandle_t xTaskToNotify);
+**         vTaskNotifyGiveFromISR             - void FRTOS1_vTaskNotifyGiveFromISR(TaskHandle_t xTaskToNotify, BaseType_t...
+**         ulTaskNotifyTake                   - uint32_t FRTOS1_ulTaskNotifyTake(BaseType_t xClearCountOnExit, TickType_t...
+**         xTaskNotify                        - BaseType_t FRTOS1_xTaskNotify(TaskHandle_t xTaskToNotify, uint32_t ulValue,...
+**         xTaskNotifyFromISR                 - BaseType_t FRTOS1_xTaskNotifyFromISR(TaskHandle_t xTaskToNotify, uint32_t...
+**         xTaskNotifyAndQuery                - BaseType_t FRTOS1_xTaskNotifyAndQuery(TaskHandle_t xTaskToNotify, uint32_t...
+**         xTaskNotifyAndQueryFromISR         - BaseType_t FRTOS1_xTaskNotifyAndQueryFromISR(TaskHandle_t xTaskToNotify,...
+**         xTaskNotifyWait                    - BaseType_t FRTOS1_xTaskNotifyWait(uint32_t ulBitsToClearOnEntry, uint32_t...
+**         vTaskSetThreadLocalStoragePointer  - void FRTOS1_vTaskSetThreadLocalStoragePointer(TaskHandle_t xTaskToSet,...
+**         pvTaskGetThreadLocalStoragePointer - void* FRTOS1_pvTaskGetThreadLocalStoragePointer(TaskHandle_t xTaskToQuery,...
+**         ParseCommand                       - uint8_t FRTOS1_ParseCommand(const unsigned char *cmd, bool *handled, const...
+**         Init                               - void FRTOS1_Init(void);
 **
 **     License : Open Source (LGPL)
 **     FreeRTOS (c) Copyright 2003-2015 Richard Barry, http: www.FreeRTOS.org
-**     FreeRTOS Processor Expert Component: (c) Copyright Erich Styger, 2013
-**     Processor Expert and CodeWarrior (c) Copyright Freescale Semiconductor, 2013, all rights reserved
+**     FreeRTOS Processor Expert Component: (c) Copyright Erich Styger, 2013-2015
+**     Processor Expert and CodeWarrior (c) Copyright Freescale Semiconductor, 2013-2015, all rights reserved
 **     This is a free software and is opened for education, research and commercial developments under license policy of following terms:
 **     * This is a free software and there is NO WARRANTY.
 **     * No restriction on use. You can use, modify and redistribute it for personal, non-profit or commercial product UNDER YOUR RESPONSIBILITY.
@@ -817,6 +825,14 @@ void vPortTickHandler(void);
 **         synchronisation (between tasks or between tasks and an
 **         interrupt), and mutexes the better choice for implementing
 **         simple mutual exclusion.
+**         This old vSemaphoreCreateBinary() macro is now deprecated in
+**         favour of the xSemaphoreCreateBinary() function.  Note that
+**         binary semaphores created using the vSemaphoreCreateBinary()
+**         macro are created in a state such that the first call to
+**         'take' the semaphore would pass, whereas binary semaphores
+**         created using xSemaphoreCreateBinary() are created in a
+**         state such that the the semaphore must first be 'given'
+**         before it can be 'taken'.
 **         A binary semaphore need not be given back once obtained, so
 **         task synchronisation can be implemented by one
 **         task/interrupt continuously 'giving' the semaphore while
@@ -1566,7 +1582,7 @@ void vPortTickHandler(void);
 ** ===================================================================
 */
 
-byte FRTOS1_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOType *io);
+uint8_t FRTOS1_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOType *io);
 /*
 ** ===================================================================
 **     Method      :  FRTOS1_ParseCommand (component FreeRTOS)
@@ -3393,6 +3409,209 @@ void FRTOS1_Init(void);
 **                           pdFALSE if the call to xTaskNotifyWait()
 **                           timed out before a notification was
 **                           received. 
+** ===================================================================
+*/
+
+#define FRTOS1_vTaskSetThreadLocalStoragePointer(xTaskToSet, xIndex, pvValue) \
+  vTaskSetThreadLocalStoragePointer(xTaskToSet, xIndex, pvValue)
+/*
+** ===================================================================
+**     Method      :  FRTOS1_vTaskSetThreadLocalStoragePointer (component FreeRTOS)
+**     Description :
+**         Only enabled if configNUM_THREAD_LOCAL_STORAGE_POINTERS is >
+**         0.
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**         xTaskToSet      - Task handle
+**         xIndex          - Index of thread local storage item
+**         pvValue         - 
+**     Returns     : Nothing
+** ===================================================================
+*/
+
+#define FRTOS1_pvTaskGetThreadLocalStoragePointer(xTaskToQuery, xIndex) \
+  pvTaskGetThreadLocalStoragePointer(xTaskToQuery, xIndex)
+/*
+** ===================================================================
+**     Method      :  FRTOS1_pvTaskGetThreadLocalStoragePointer (component FreeRTOS)
+**     Description :
+**         Sets the thread local storage. Only enabled if
+**         configNUM_THREAD_LOCAL_STORAGE_POINTERS is >0
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**         xTaskToQuery    - Task handle from which
+**                           to get the local thread storage.
+**         xIndex          - Index of thread storage
+**     Returns     :
+**         ---             - Error code
+** ===================================================================
+*/
+
+#define FRTOS1_xSemaphoreCreateBinary() \
+  xSemaphoreCreateBinary()
+/*
+** ===================================================================
+**     Method      :  FRTOS1_xSemaphoreCreateBinary (component FreeRTOS)
+**     Description :
+**         The old vSemaphoreCreateBinary() macro is now deprecated in
+**         favour of this xSemaphoreCreateBinary() function.  Note that
+**         binary semaphores created using the vSemaphoreCreateBinary()
+**         macro are created in a state such that the first call to
+**         'take' the semaphore would pass, whereas binary semaphores
+**         created using xSemaphoreCreateBinary() are created in a
+**         state such that the the semaphore must first be 'given'
+**         before it can be 'taken'.
+**         Function that creates a semaphore by using the existing
+**         queue mechanism. The queue length is 1 as this is a binary
+**         semaphore.  The data size is 0 as nothing is actually stored
+**         - all that is important is whether the queue is empty or
+**         full (the binary semaphore is available or not).
+**         This type of semaphore can be used for pure synchronisation
+**         between tasks or between an interrupt and a task.  The
+**         semaphore need not be given back once obtained, so one
+**         task/interrupt can continuously 'give' the semaphore while
+**         another continuously 'takes' the semaphore.  For this reason
+**         this type of semaphore does not use a priority inheritance
+**         mechanism.  For an alternative that does use priority
+**         inheritance see xSemaphoreCreateMutex().
+**     Parameters  : None
+**     Returns     :
+**         ---             - Handle to the created semaphore.
+** ===================================================================
+*/
+
+#define FRTOS1_xTaskNotifyAndQuery(xTaskToNotify, ulValue, eAction, pulPreviousNotifyValue) \
+  xTaskNotifyAndQuery(xTaskToNotify, ulValue, eAction, pulPreviousNotifyValue)
+/*
+** ===================================================================
+**     Method      :  FRTOS1_xTaskNotifyAndQuery (component FreeRTOS)
+**     Description :
+**          [If you are using RTOS task notifications to implement
+**         binary or counting semaphore type behaviour then use the
+**         simpler xTaskNotifyGive() API function instead of
+**         xTaskNotify()]
+**         Each RTOS task has a 32-bit notification value which is
+**         initialised to zero when the RTOS task is created.
+**         xTaskNotify() is used to send an event directly to and
+**         potentially unblock an RTOS task, and optionally update the
+**         receiving task's notification value in one of the following
+**         ways:
+**         - Write a 32-bit number to the notification value
+**         - Add one (increment) the notification value
+**         - Set one or more bits in the notification value
+**         - Leave the notification value unchanged
+**         This function must not be called from an interrupt service
+**         routine (ISR). Use xTaskNotifyFromISR() instead. 
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**         xTaskToNotify   - The handle of the RTOS
+**                           task being notified. This is the subject
+**                           task.
+**                           RTOS task handles are obtained using the
+**                           pvCreatedTask parameter of the xTaskCreate()
+**                           call used to create the task.
+**                           The handle of the currently executing RTOS
+**                           task is returned by the
+**                           xTaskGetCurrentTaskHandle() API function. 
+**         ulValue         - Used to update the notification
+**                           value of the subject task. See the
+**                           description of the eAction parameter below. 
+**         eAction         - An enumerated type that can take
+**                           one of the values documented in the table
+**                           below in order to perform the associated
+**                           action. 
+**       * pulPreviousNotifyValue - Can
+**                           be used to pass out the subject task's
+**                           notification value before any bits are
+**                           modified by the action of
+**                           xTaskNotifyAndQuery().
+**                           pulPreviousNotifyValue is an optional
+**                           parameter, and can be set to NULL if it is
+**                           not required. If pulPreviousNotifyValue is
+**                           not used then consider using xTaskNotify()
+**                           in place of xTaskNotifyAndQuery(). 
+**     Returns     :
+**         ---             - pdPASS is returned in all cases other than
+**                           when eAction is set to
+**                           eSetValueWithoutOverwrite and the subject
+**                           task's notification value cannot be updated
+**                           because the subject task already had a
+**                           notification pending. 
+** ===================================================================
+*/
+
+#define FRTOS1_xTaskNotifyAndQueryFromISR(xTaskToNotify, ulValue, eAction, pulPreviousNotifyValue, pxHigherPriorityTaskWoken) \
+  xTaskNotifyAndQueryFromISR(xTaskToNotify, ulValue, eAction, pulPreviousNotifyValue, pxHigherPriorityTaskWoken)
+/*
+** ===================================================================
+**     Method      :  FRTOS1_xTaskNotifyAndQueryFromISR (component FreeRTOS)
+**     Description :
+**          [If you are using RTOS task notifications to implement
+**         binary or counting semaphore type behaviour then use the
+**         simpler xTaskNotifyGive() API function instead of
+**         xTaskNotify()]
+**         Each RTOS task has a 32-bit notification value which is
+**         initialised to zero when the RTOS task is created.
+**         xTaskNotify() is used to send an event directly to and
+**         potentially unblock an RTOS task, and optionally update the
+**         receiving task's notification value in one of the following
+**         ways:
+**         - Write a 32-bit number to the notification value
+**         - Add one (increment) the notification value
+**         - Set one or more bits in the notification value
+**         - Leave the notification value unchanged
+**         This function must not be called from an interrupt service
+**         routine (ISR). Use xTaskNotifyFromISR() instead. 
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**         xTaskToNotify   - The handle of the RTOS
+**                           task being notified. This is the subject
+**                           task.
+**                           RTOS task handles are obtained using the
+**                           pvCreatedTask parameter of the xTaskCreate()
+**                           call used to create the task.
+**                           The handle of the currently executing RTOS
+**                           task is returned by the
+**                           xTaskGetCurrentTaskHandle() API function. 
+**         ulValue         - Used to update the notification
+**                           value of the subject task. See the
+**                           description of the eAction parameter below. 
+**         eAction         - An enumerated type that can take
+**                           one of the values documented in the table
+**                           below in order to perform the associated
+**                           action. 
+**       * pulPreviousNotifyValue - Can
+**                           be used to pass out the subject task's
+**                           notification value before any bits are
+**                           modified by the action of
+**                           xTaskNotifyAndQuery().
+**                           pulPreviousNotifyValue is an optional
+**                           parameter, and can be set to NULL if it is
+**                           not required. If pulPreviousNotifyValue is
+**                           not used then consider using xTaskNotify()
+**                           in place of xTaskNotifyAndQuery(). 
+**       * pxHigherPriorityTaskWoken 
+**                           - *pxHigherPriorityTaskWoken must be
+**                           initialised to 0.
+**                           xTaskNotifyFromISR() will set
+**                           *pxHigherPriorityTaskWoken to pdTRUE if
+**                           sending the notification caused a task to
+**                           unblock, and the unblocked task has a
+**                           priority higher than the currently running
+**                           task.
+**                           If xTaskNotifyFromISR() sets this value to
+**                           pdTRUE then a context switch should be
+**                           requested before the interrupt is exited.
+**                           See the example below.
+**                           pxHigherPriorityTaskWoken is an optional
+**                           parameter and can be set to NULL. 
+**     Returns     :
+**         ---             - pdPASS is returned in all cases other than
+**                           when eAction is set to
+**                           eSetValueWithoutOverwrite and the subject
+**                           task's notification value cannot be updated
+**                           because the subject task already had a
+**                           notification pending. 
 ** ===================================================================
 */
 

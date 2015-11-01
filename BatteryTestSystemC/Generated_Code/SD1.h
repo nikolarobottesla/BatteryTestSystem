@@ -4,10 +4,10 @@
 **     Project     : BatteryTestSystemC
 **     Processor   : MKL25Z128VLK4
 **     Component   : SD_Card
-**     Version     : Component 01.177, Driver 01.00, CPU db: 3.00.000
-**     Repository  : mcuoneclipse
+**     Version     : Component 01.178, Driver 01.00, CPU db: 3.00.000
+**     Repository  : My Components
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-09-10, 20:48, # CodeGen: 22
+**     Date/Time   : 2015-11-01, 08:35, # CodeGen: 38
 **     Abstract    :
 **         Implements interface to SD card for FatFs
 **     Settings    :
@@ -56,7 +56,7 @@
 **         InitCommChannel  - void SD1_InitCommChannel(void);
 **
 **     License   :  Open Source (LGPL)
-**     Copyright : (c) Copyright Erich Styger, 2012-2014, all rights reserved.
+**     Copyright : (c) Copyright Erich Styger, 2012-2015, all rights reserved.
 **     Web       : www.mcuoneclipse.com
 **     This an open source software implementing an SD card low level driver useful for the the ChaN FatFS, using Processor Expert.
 **     This is a free software and is opened for education,  research and commercial developments under license policy of following terms:

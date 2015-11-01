@@ -4,10 +4,10 @@
 **     Project     : BatteryTestSystemC
 **     Processor   : MKL25Z128VLK4
 **     Component   : GenericTimeDate
-**     Version     : Component 01.020, Driver 01.00, CPU db: 3.00.000
-**     Repository  : mcuoneclipse
+**     Version     : Component 01.027, Driver 01.00, CPU db: 3.00.000
+**     Repository  : My Components
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-26, 01:31, # CodeGen: 5
+**     Date/Time   : 2015-11-01, 08:35, # CodeGen: 38
 **     Abstract    :
 **         Software date/time module.
 **     Settings    :
@@ -26,6 +26,8 @@
 **     Contents    :
 **         AddTick      - void TmDt1_AddTick(void);
 **         AddTicks     - void TmDt1_AddTicks(uint16_t nofTicks);
+**         TicksToTime  - uint8_t TmDt1_TicksToTime(uint32_t ticks, TIMEREC *Time);
+**         TimeToTicks  - uint8_t TmDt1_TimeToTicks(TIMEREC *Time, uint32_t *ticks);
 **         SetTime      - uint8_t TmDt1_SetTime(uint8_t Hour, uint8_t Min, uint8_t Sec, uint8_t Sec100);
 **         GetTime      - uint8_t TmDt1_GetTime(TIMEREC *Time);
 **         SetDate      - uint8_t TmDt1_SetDate(uint16_t Year, uint8_t Month, uint8_t Day);
@@ -54,7 +56,7 @@
 #include "TmDt1.h"
 
 #define TmDt1_TICK_TIME_MS \
-  (1000/100)                            /* Period in milliseconds as defined in RTOS component properties, at which TmDt1._AddTick() is called */
+  (1000/100)                            /* Period in milliseconds as defined in RTOS component properties, at which TmDt1_AddTick() is called */
 #if TmDt1_TICK_TIME_MS==0
   #error "Tick period cannot be zero!"
 #endif
@@ -66,8 +68,8 @@ static uint16_t CntYear;               /* Year Counter */
 static uint32_t tickCntr;              /* Software tick counter (1 tick = TmDt1_TICK_TIME_MS ms) */
 
 /* Table of month length (in days) */
-static const  uint8_t ULY[12] = {31U,28U,31U,30U,31U,30U,31U,31U,30U,31U,30U,31U}; /* Un-leap-year */
-static const  uint8_t  LY[12] = {31U,29U,31U,30U,31U,30U,31U,31U,30U,31U,30U,31U}; /* Leap-year */
+static const uint8_t ULY[12] = {31U,28U,31U,30U,31U,30U,31U,31U,30U,31U,30U,31U}; /* Un-leap-year */
+static const uint8_t  LY[12] = {31U,29U,31U,30U,31U,30U,31U,31U,30U,31U,30U,31U}; /* Leap-year */
 
 static uint8_t AddDate(uint8_t *buf, uint16_t bufSize) {
   DATEREC tdate;
@@ -216,16 +218,20 @@ static uint8_t PrintStatus(CLS1_ConstStdIOType *io) {
 #endif
 uint8_t TmDt1_SetTime(uint8_t Hour, uint8_t Min, uint8_t Sec, uint8_t Sec100)
 {
+  uint32_t nofTicks;
+  TIMEREC time;
   CS1_CriticalVariable()
 
   if ((Sec100>99U) || (Sec>59U) || (Min>59U) || (Hour>23U)) { /* Test correctnes of given time */
     return ERR_RANGE;                  /* If not correct then error */
   }
+  time.Hour = Hour;
+  time.Min = Min;
+  time.Sec = Sec;
+  time.Sec100 = Sec100;
+  TmDt1_TimeToTicks(&time, &nofTicks);
   CS1_EnterCritical();
-  tickCntr = (3600UL*TmDt1_TICKS_PER_S*(uint32_t)Hour)
-              + (60UL*TmDt1_TICKS_PER_S*(uint32_t)Min)
-              + (TmDt1_TICKS_PER_S*(uint32_t)Sec)
-              + ((TmDt1_TICKS_PER_S/100)*(uint32_t)Sec100); /* Load given time re-calculated to TmDt1_TICK_TIME_MS ms ticks into software tick counter */
+  tickCntr = nofTicks;
   CS1_ExitCritical();
   return ERR_OK;                       /* OK */
 }
@@ -314,19 +320,15 @@ void TmDt1_AddTicks(uint16_t nofTicks)
 uint8_t TmDt1_GetTime(TIMEREC *Time)
 {
   uint32_t ticks;                      /* temporary variable of software tick counter */
+  uint8_t res;
   CS1_CriticalVariable()
 
   CS1_EnterCritical();                 /* need exclusive access to tick counter */
   ticks = tickCntr;                    /* actual number of ticks */
   CS1_ExitCritical();                  /* end of critical section */
-  Time->Hour = (uint8_t)(ticks/(3600*TmDt1_TICKS_PER_S)); /* number of hours */
-  ticks %= (3600*TmDt1_TICKS_PER_S);   /* remainder of ticks inside hour */
-  Time->Min = (uint8_t)(ticks/(60*TmDt1_TICKS_PER_S)); /* number of minutes */
-  ticks %= (60*TmDt1_TICKS_PER_S);     /* remainder of ticks inside minute */
-  Time->Sec = (uint8_t)(ticks/TmDt1_TICKS_PER_S); /* number of seconds */
-  ticks %= TmDt1_TICKS_PER_S;
-  Time->Sec100 = (uint8_t)((ticks*(1000/TmDt1_TICKS_PER_S))/10); /* number of 1/100 seconds */
-  return ERR_OK;
+
+  res = TmDt1_TicksToTime(ticks, Time);
+  return res;
 }
 
 /*
@@ -452,6 +454,57 @@ uint8_t TmDt1_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_S
 void TmDt1_DeInit(void)
 {
   /* Nothing to do */
+}
+
+/*
+** ===================================================================
+**     Method      :  TmDt1_TicksToTime (component GenericTimeDate)
+**     Description :
+**         Transforms ticks into time information
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**         ticks           - 
+**       * Time            - Pointer where to store the time
+**                           information
+**     Returns     :
+**         ---             - Error code
+** ===================================================================
+*/
+uint8_t TmDt1_TicksToTime(uint32_t ticks, TIMEREC *Time)
+{
+  Time->Hour = (uint8_t)(ticks/(3600*TmDt1_TICKS_PER_S)); /* number of hours */
+  ticks %= (3600*TmDt1_TICKS_PER_S);   /* remainder of ticks inside hour */
+  Time->Min = (uint8_t)(ticks/(60*TmDt1_TICKS_PER_S)); /* number of minutes */
+  ticks %= (60*TmDt1_TICKS_PER_S);     /* remainder of ticks inside minute */
+  Time->Sec = (uint8_t)(ticks/TmDt1_TICKS_PER_S); /* number of seconds */
+  ticks %= TmDt1_TICKS_PER_S;
+  Time->Sec100 = (uint8_t)((ticks*(1000/TmDt1_TICKS_PER_S))/10); /* number of 1/100 seconds */
+  return ERR_OK;
+}
+
+/*
+** ===================================================================
+**     Method      :  TmDt1_TimeToTicks (component GenericTimeDate)
+**     Description :
+**         Transforms time information into ticks
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**       * Time            - Pointer where to time information
+**       * ticks           - Pointer to where to store the ticks
+**     Returns     :
+**         ---             - Error code
+** ===================================================================
+*/
+uint8_t TmDt1_TimeToTicks(TIMEREC *Time, uint32_t *ticks)
+{
+  uint32_t tickCntr;
+
+  tickCntr = (3600UL*TmDt1_TICKS_PER_S*(uint32_t)Time->Hour)
+              + (60UL*TmDt1_TICKS_PER_S*(uint32_t)Time->Min)
+              + (TmDt1_TICKS_PER_S*(uint32_t)Time->Sec)
+              + ((TmDt1_TICKS_PER_S/100)*(uint32_t)Time->Sec100); /* Load given time re-calculated to TmDt1_TICK_TIME_MS ms ticks into software tick counter */
+  *ticks = tickCntr;
+  return ERR_OK;
 }
 
 /* END TmDt1. */

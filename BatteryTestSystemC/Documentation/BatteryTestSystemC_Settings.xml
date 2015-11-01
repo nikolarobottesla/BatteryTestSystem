@@ -115,17 +115,19 @@ PE_DEBUGHALT();
     <Enabled v="Y" />
     <Properties>
       <Component_name v="FRTOS1" />
-      <RTOS_Version v="V8.2.0" />
+      <RTOS_Version v="V8.2.2" />
+      <boolgroup name="Kinetis SDK" v="Disabled" />
       <group name="Custom Port">
         <Compiler v="automatic" />
         <boolgroup name="Static Sources" v="Disabled" />
         <boolgroup name="Custom portBASE_TYPE" v="Disabled" />
       </group>
-      <boolgroup name="Kinetis SDK" v="Disabled" />
       <Classic_CodeWarrior v="no" />
       <Disabled_Interrupts_in_Startup v="yes" />
       <configASSERT_defined v="yes" />
+      <Enable_GDB_Debug_Helper v="no" />
       <Application_Task_Tags v="no" />
+      <Thread_Local_Storage_Pointers v="0" />
       <Use_Trace_Facility v="yes" />
       <boolgroup name="Trace Hooks" v="Disabled" />
       <boolgroup name="Collect Runtime Statistics" v="Disabled" />
@@ -133,7 +135,7 @@ PE_DEBUGHALT();
         <boolgroup name="ColdFire V1" v="Disabled" />
         <boolgroup name="ColdFire V2" v="Disabled" />
         <boolgroup name="Kinetis" v="Enabled">
-          <ARM_Family v="Cortex M0+" />
+          <ARM_Family v="Cortex-M0+" />
           <Floating_Point_Support v="no" />
           <Max_SysCall_Interrupt_Priority v="1" />
           <RTOS_Interrupt_Priority v="3" />
@@ -173,6 +175,7 @@ PE_DEBUGHALT();
       </group>
       <boolgroup name="Timers" v="Disabled" />
       <group name="Memory">
+        <Application_allocated_Heap v="no" />
         <Memory_Allocation_Scheme v="Scheme 2" />
         <boolgroup name="User Heap Section" v="Disabled" />
         <Total_Heap_Size v="8192" />
@@ -210,7 +213,7 @@ PE_DEBUGHALT();
       <xSemaphoreCreateMutex v="generate code" />
       <xSemaphoreTake v="generate code" />
       <xSemaphoreGive v="generate code" />
-      <vSemaphoreCreateBinary v="generate code" />
+      <xSemaphoreCreateBinary v="generate code" />
       <xSemaphoreCreateCounting v="generate code" />
       <xSemaphoreGiveFromISR v="generate code" />
       <xSemaphoreTakeFromISR v="generate code" />
@@ -285,7 +288,11 @@ PE_DEBUGHALT();
       <ulTaskNotifyTake v="generate code" />
       <xTaskNotify v="generate code" />
       <xTaskNotifyFromISR v="generate code" />
+      <xTaskNotifyAndQuery v="generate code" />
+      <xTaskNotifyAndQueryFromISR v="generate code" />
       <xTaskNotifyWait v="generate code" />
+      <vTaskSetThreadLocalStoragePointer v="generate code" />
+      <pvTaskGetThreadLocalStoragePointer v="generate code" />
       <ParseCommand v="generate code" />
       <Init v="generate code" />
     </Methods>
@@ -522,7 +529,9 @@ PE_DEBUGHALT();
     <Events>
       <Event_module_name v="Events" />
       <event name="OnTimeSet" v="don&amp;apos;t generate code" />
+      <event name="OnTimeGet" v="don&amp;apos;t generate code" />
       <event name="OnDateSet" v="don&amp;apos;t generate code" />
+      <event name="OnDateGet" v="don&amp;apos;t generate code" />
     </Events>
   </Bean>
   <Bean name="WAIT1" type="Wait">
