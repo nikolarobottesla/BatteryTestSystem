@@ -3,10 +3,10 @@
   <Header>
     <Name>BatteryTestSystemC</Name>
     <SavedBy>Milo</SavedBy>
-    <ModificationStamp>22</ModificationStamp>
+    <ModificationStamp>23</ModificationStamp>
     <Date>2015-07-25</Date>
     <IDE>Eclipse IDE</IDE>
-    <PEversion>1.12.0.RT7_b1515-0427</PEversion>
+    <PEversion>1.12.1.RT7_b1531-0480</PEversion>
   </Header>
   <Options>
     <ProjectMainModule>main</ProjectMainModule>
@@ -29,7 +29,7 @@
     <UseExistingModules>true</UseExistingModules>
     <RenamePeripheries>false</RenamePeripheries>
     <Autodependency>true</Autodependency>
-    <ProjectCompNumb>110</ProjectCompNumb>
+    <ProjectCompNumb>116</ProjectCompNumb>
     <DelUnusedPreviouslyGenFiles>true</DelUnusedPreviouslyGenFiles>
     <GeneratedCodeFrozen>false</GeneratedCodeFrozen>
     <AssignInitComponentNameToPrph>true</AssignInitComponentNameToPrph>
@@ -4560,7 +4560,7 @@
     </ItemState>
   </Configuration>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>FreeRTOS</BeanType>
     <Name>FRTOS1</Name>
     <CompNumb>3</CompNumb>
@@ -4775,9 +4775,9 @@
         <UserReadOnly>false</UserReadOnly>
         <Index>0</Index>
         <RegCompType>PercepioTrace</RegCompType>
-        <RegCompRepository>file:/${home_ProcessorExpert_loc}/MyComponents</RegCompRepository>
+        <RegCompRepository>file:/C:\Dark Angel\Documents\KDS workspace\shared</RegCompRepository>
         <InheritedComponentState>
-          <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+          <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
         </InheritedComponentState>
       </ItemState>
       <ItemState>
@@ -4899,8 +4899,8 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Index>0</Index>
-        <EnumSymbVal>M0+</EnumSymbVal>
+        <Index>1</Index>
+        <EnumSymbVal>M4</EnumSymbVal>
       </ItemState>
       <ItemState>
         <ItemSymbol>M4FFloatingPointSupport</ItemSymbol>
@@ -4929,7 +4929,7 @@
       <ItemState>
         <ItemSymbol>ARMLowestInterrutpPriority</ItemSymbol>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>3</Value>
+        <Value>15</Value>
         <Base>DEC</Base>
       </ItemState>
       <ItemState>
@@ -4950,7 +4950,7 @@
       </ItemState>
       <ItemState>
         <ItemSymbol>useARMSysTickUseCoreClock</ItemSymbol>
-        <ReadOnly>false</ReadOnly>
+        <ReadOnly>true</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
         <Index>0</Index>
@@ -6679,7 +6679,7 @@
     </Events>
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>LED</BeanType>
     <Name>LEDR</Name>
     <CompNumb>8</CompNumb>
@@ -8859,7 +8859,7 @@
     <Events />
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>LED</BeanType>
     <Name>LEDG</Name>
     <CompNumb>11</CompNumb>
@@ -9647,7 +9647,7 @@
     <Events />
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>GenericTimeDate</BeanType>
     <Name>TmDt1</Name>
     <CompNumb>14</CompNumb>
@@ -9940,7 +9940,7 @@
     </Events>
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>Wait</BeanType>
     <Name>WAIT1</Name>
     <CompNumb>15</CompNumb>
@@ -10133,7 +10133,7 @@
     <Events />
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>Timeout</BeanType>
     <Name>TMOUT1</Name>
     <CompNumb>16</CompNumb>
@@ -10271,7 +10271,7 @@
     <Events />
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>FAT_FileSystem</BeanType>
     <Name>FAT1</Name>
     <CompNumb>17</CompNumb>
@@ -11157,7 +11157,7 @@
     </Events>
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>Utility</BeanType>
     <Name>UTIL1</Name>
     <CompNumb>20</CompNumb>
@@ -14601,7 +14601,7 @@
     </Events>
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>Shell</BeanType>
     <Name>CLS1</Name>
     <CompNumb>23</CompNumb>
@@ -14665,7 +14665,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>100</Value>
+        <Value>200</Value>
         <Base>DEC</Base>
       </ItemState>
       <ItemState>
@@ -15148,7 +15148,7 @@
     </Events>
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>SD_Card</BeanType>
     <Name>SD1</Name>
     <CompNumb>24</CompNumb>
@@ -16098,7 +16098,7 @@
     </Events>
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>CriticalSection</BeanType>
     <Name>CS1</Name>
     <CompNumb>26</CompNumb>
@@ -27680,7 +27680,7 @@
     </Events>
   </Bean>
   <Bean>
-    <Repository>file:/${home_ProcessorExpert_loc}/MyComponents</Repository>
+    <Repository>file:/C:\Dark Angel\Documents\KDS workspace\shared</Repository>
     <BeanType>minIni</BeanType>
     <Name>MINI1</Name>
     <CompNumb>79</CompNumb>

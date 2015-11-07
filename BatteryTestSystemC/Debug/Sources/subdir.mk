@@ -26,7 +26,7 @@ C_DEPS += \
 Sources/%.o: ../Sources/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross ARM C Compiler'
-	arm-none-eabi-gcc -mcpu=cortex-m0plus -mthumb -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -I"C:/Users/sword/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/PDD" -I"C:/Users/sword/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/IO_Map" -I"C:/Users/sword/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Sources" -I"C:/Users/sword/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code" -std=c99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m0plus -mthumb -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -I"C:/Dark Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/PDD" -I"C:/Dark Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Static_Code/IO_Map" -I"C:/Dark Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Sources" -I"C:/Dark Angel/Documents/GitHub/BatteryTestSystem/BatteryTestSystemC/Generated_Code" -std=c99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

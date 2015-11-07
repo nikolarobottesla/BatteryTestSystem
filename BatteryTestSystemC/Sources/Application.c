@@ -57,7 +57,8 @@ static float rateVBat;				//the battery voltage rate, used for cell dropout chec
 static float PID_perCurrentSet;		//float, stores the battery current setting scaled between 0 and 1
 static float PID_perCurrentLimit;	//float, stores current limit scaled between 0 and 1
 static float PID_intError;			//integration result from previous loop + error * periodSec
-static char charBuff[64];				//buffer used for io
+static char charBuff[64];			//buffer used for io
+TickType_t xLastWakeTime;			//Declare the xLastWakeTime variable
 
 /*OS task not used
 static portTASK_FUNCTION(R_LEDblink, pvParameters) {
@@ -77,7 +78,7 @@ static portTASK_FUNCTION(control, pvParameters) {
   DIS_PWM_Enable();
   Stop_CHG_DIS();
   AD1_Calibrate(1);	//calibrate adc and wait till done
-  TickType_t xLastWakeTime= xTaskGetTickCount(); //Declare and init the xLastWakeTime variable with the current time.
+
 
   for(;;) {
 
@@ -86,20 +87,20 @@ static portTASK_FUNCTION(control, pvParameters) {
 	  }
 
 	  while(state >= CHG_MODE){
-		  timeStamp[dp] = lastStamp + 1;
+		  LEDR_Neg();
+
+		  timeStamp[dp] = lastStamp + 1;	//increment timestamp
 
 		  Measure_All();
 		  Chk_Complete();
-
 		  Iterate_PID();
-//TODO	  //write data to uSD
-		  LEDR_Neg();
-		  lastStamp = timeStamp[dp];	//save the last time stamp for use in the next loop iteration
-
+		  //TODO	  //write data to uSD
 		  //print status if verbose is set to 1
+
 		  if (verbose == 1)
 			PrintStatus(CLS1_GetStdio());
 
+		  lastStamp = timeStamp[dp];	//save the last time stamp for use in the next loop iteration
 		  dp++;							//increment pointer for data buffers
 		  if (dp >= DATA_BUFF_SIZE){
 			  dp=0;						//reset pointer for data buffers
@@ -142,10 +143,14 @@ static void Load_Settings(void){
     preVBat=0;								//initialize at 0mV to prevent cell dropout detector from triggering on 1st check
     periodSec = interval / 1000;			//calculate the measure period in seconds
     PID_intError = 0;
+
+    xLastWakeTime= xTaskGetTickCount(); 	//reload xLastWakeTime variable with the current time, this needs to be loaded
+    										//just prior to starting the cycle, if loaded before cycle start the first few
+    										//loops of the while loop will happen very fast
 }
 
 static void Measure_All(void){
-	AD1_Measure(1);					//start adc conversion and wait till complete
+	//AD1_Measure(1);					//start adc conversion and wait till complete
 	AD1_GetValue16(&rawADC[0]);		//put ADC values in array rawADC
 	VBat[dp] = rawADC[VBAT_SE] / (float)0xFFFF * 9900;	//measure the battery voltage, convert to mV, put in array
 	temp[dp] = rawADC[VTEMP] / (float)0xFFFF * 3300;	//measure the battery temp voltage, convert to mV, put in array
@@ -267,6 +272,46 @@ static void Iterate_PID(void){
 				DIS_PWM_SetRatio16(int_PID_out);//set discharge current
 		//}
 	}
+}
+
+static void LogToFile() {
+  uint8_t write_buf[48];
+  UINT bw;
+  TIMEREC time;
+
+  /* open file */
+  if (FAT1_open(&fp, "./log.txt", FA_OPEN_ALWAYS|FA_WRITE)!=FR_OK) {
+    Err();
+  }
+  /* move to the end of the file */
+  if (FAT1_lseek(&fp, fp.fsize) != FR_OK || fp.fptr != fp.fsize) {
+    Err();
+  }
+  /* get time */
+  if (TmDt1_GetTime(&time)!=ERR_OK) {
+    Err();
+  }
+  /* write data */
+  write_buf[0] = '\0';
+  UTIL1_strcatNum8u(write_buf, sizeof(write_buf), time.Hour);
+  UTIL1_chcat(write_buf, sizeof(write_buf), ':');
+  UTIL1_strcatNum8u(write_buf, sizeof(write_buf), time.Min);
+  UTIL1_chcat(write_buf, sizeof(write_buf), ':');
+  UTIL1_strcatNum8u(write_buf, sizeof(write_buf), time.Sec);
+  UTIL1_chcat(write_buf, sizeof(write_buf), '\t');
+
+  UTIL1_strcatNum16s(write_buf, sizeof(write_buf), x);
+  UTIL1_chcat(write_buf, sizeof(write_buf), '\t');
+  UTIL1_strcatNum16s(write_buf, sizeof(write_buf), y);
+  UTIL1_chcat(write_buf, sizeof(write_buf), '\t');
+  UTIL1_strcatNum16s(write_buf, sizeof(write_buf), z);
+  UTIL1_strcat(write_buf, sizeof(write_buf), (unsigned char*)"\r\n");
+  if (FAT1_write(&fp, write_buf, UTIL1_strlen((char*)write_buf), &bw)!=FR_OK) {
+    (void)FAT1_close(&fp);
+    Err();
+  }
+  /* closing file */
+  (void)FAT1_close(&fp);
 }
 
 void APP_Run(void) {
@@ -450,7 +495,7 @@ static void State_Machine(const CLS1_StdIOType *io){
 		CLS1_SendStr((unsigned char*)"cycle ended due to over temperature, aborting\r\n", io->stdOut);
 		nextState = IDLE_MODE;
 	}else if (doneReason == USER_COMMAND){
-		//CLS1_SendStr((unsigned char*)"cycle ended due to user command, aborting\r\n", io->stdOut);
+		CLS1_SendStr((unsigned char*)"cycle ended due to user command, aborting\r\n", io->stdOut);
 		nextState = IDLE_MODE;
 	}else if (doneReason == OVER_CURRENT){
 		CLS1_SendStr((unsigned char*)"cycle ended due to over-current condition, aborting\r\n", io->stdOut);
@@ -475,6 +520,7 @@ static uint8_t Start(const CLS1_StdIOType *io){
 		nextState = firstState;		//initialize nextState, Load_Settings will load this into state
 		cyclesLeft = maxCycles;		//load cyclesLeft with maxCycles
 		CLS1_SendStr((unsigned char*)"BTS starting\r\n", io->stdOut);
+
 	}else
 		CLS1_SendStr((unsigned char*)"already started\r\n", io->stdOut);
 

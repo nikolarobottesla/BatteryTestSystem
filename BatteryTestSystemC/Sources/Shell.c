@@ -37,6 +37,7 @@ static const CLS1_ParseCommandCallback CmdParserTable[] =
   FAT1_ParseCommand,
 #endif
   BTS_ParseCommand,				//Battery Test System command parse table entry
+  TmDt1_ParseCommand,			//Generic time and date
   NULL /* sentinel */
 };
 
