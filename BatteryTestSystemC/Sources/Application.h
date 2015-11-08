@@ -60,5 +60,8 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io);
 static uint8_t PrintStatus(const CLS1_StdIOType *io);
 static void Load_Current(int newCurrent);
 static uint8_t Toggle_Verbose();
+static uint8_t Toggle_Logging();
+static void LogToFile();
+
 
 

@@ -12,6 +12,8 @@
 #include "AD1.h"
 #include "WAIT1.h"
 #include "CS1.h"
+#include "TmDt1.h"
+#include "FAT1.h"
 
 /* Global Variales */
 static volatile int state=IDLE_MODE;//used to control the run mode of the system IDLE_MODE, INT_RES_TEST, CHG_MODE, DIS_MODE, CYCLE_DONE
@@ -19,6 +21,7 @@ static int maxCycles = 2;			//number of charge/discharge cycles
 static int firstState = CHG_MODE;	//set to start charge or discharge as the first cycle
 static volatile int doneReason=0;	//reason the cycle ended, see header file for macro
 static int verbose=0;				//if set to 1 the status is printed every loop
+static int logEnabled = 0;			//if set to 1 the status data is saved to a log file on uSD card
 static volatile int chgCurrSet=0;	//charge current in mA
 static volatile int disCurrSet=0;	//discharge current in mA
 static float currentLimit=6500;		//current limit in mA
@@ -26,7 +29,8 @@ static float maxCurrSense=11000;	//the maximum current the adc can sense in mA
 static int deltaPeak=24;			//delta peak charge cutoff voltage in mV (6 cells * 4mV)
 static int disVcut=5400;			//discharge voltage cutoff in mV
 static float VBatRateLimit = -10;	//cell dropout rate [mV/s]
-static int chgTimeout = 1;		//charge cycle timeout in minutes
+//TODO change charge timeout back to longer time
+static int chgTimeout = 1;			//charge cycle timeout in minutes
 static int disTimeout = 120;		//discharge cycle timeout in minutes
 static TickType_t interval = 1000;	//measurement interval in ms
 static unsigned int waitTime = 5;	//wait time between cycles in minutes
@@ -35,6 +39,7 @@ static int disCapLimit = 8000;		//discharge capacity limit [mAh]
 static int nextState = 0;			//state machine tells the start routine the next state using this variable
 static int cyclesLeft = 0;			//number of cycles left over not including current cycle
 static float capacity;				//accumulates capacity [mAh]
+int intCapacity;				 	//capcity converted to int type, used for displaying status and writing to file
 static float OTthresh = 50;        	//over temperature threshhold in celsius
 static float PID_Kp = 0.1;          //Proportional constant
 static float PID_Ki = 0.05;         //Integral constant
@@ -59,6 +64,7 @@ static float PID_perCurrentLimit;	//float, stores current limit scaled between 0
 static float PID_intError;			//integration result from previous loop + error * periodSec
 static char charBuff[64];			//buffer used for io
 TickType_t xLastWakeTime;			//Declare the xLastWakeTime variable
+static FIL fp;						//declare a file pointer, used to save data to file
 
 /*OS task not used
 static portTASK_FUNCTION(R_LEDblink, pvParameters) {
@@ -94,11 +100,14 @@ static portTASK_FUNCTION(control, pvParameters) {
 		  Measure_All();
 		  Chk_Complete();
 		  Iterate_PID();
-		  //TODO	  //write data to uSD
-		  //print status if verbose is set to 1
 
-		  if (verbose == 1)
+		  if (logEnabled == 1){		//if log is enabled
+			  LogToFile();				//log to file on uSD card
+		  }
+
+		  if (verbose == 1){		//print status if verbose is set to 1
 			PrintStatus(CLS1_GetStdio());
+		  }
 
 		  lastStamp = timeStamp[dp];	//save the last time stamp for use in the next loop iteration
 		  dp++;							//increment pointer for data buffers
@@ -174,7 +183,7 @@ static void Measure_All(void){
 
 	//calculate capacity
 	capacity = capacity + ( current[dp] * (periodSec / 3600) );	// mAh + A/(1000mA/A) * (s / (60s/m) / (60m/h) )
-
+	intCapacity = (int) capacity;		//convert to integer for display and storage
 }
 
 static void Chk_Complete(void){
@@ -191,37 +200,40 @@ static void Chk_Complete(void){
 		//delta peak check
 		deltaVBat = maxVBat - VBat[dp]; //calculate delta
 		if (deltaVBat > deltaPeak){
-			state = CYCLE_DONE;					//set state to 'cycle done'
-			doneReason = DELTA_PEAK;				//set doneReason
+			state = CYCLE_DONE;				//set state to 'cycle done'
+			doneReason = DELTA_PEAK;		//set doneReason
 		//if the charge timeout is reached
-		}else if ((timeStamp[dp]*interval) >= (chgTimeout*60*interval)){	//check if delta is larger than allowed
+		}else if ((timeStamp[dp]*interval) >= (chgTimeout*60*interval)){
 			state = CYCLE_DONE;					//set state to 'cycle done'
-			doneReason = TIMEOUT;			//set doneReason
+			doneReason = TIMEOUT;				//set doneReason
+		}else if (intCapacity > chgCapLimit){//if the capacity limit is reached
+			state = CYCLE_DONE;					//set sstate to 'cycle done'
+			doneReason = OVER_CAPACITY;			//set doneReason
 		}
-
-//TODO	//capacity check charge and discharge
 
 	}else if (state==DIS_MODE){              //if in discharge state
 
-		//if the discharge timeout is reached
-		if ((timeStamp[dp]*interval) >= (disTimeout*60*interval)){
-			state = CYCLE_DONE;		//set state to 'cycle done'
-			doneReason = TIMEOUT;	//
-		}
-		//measure threshhold
-		if (VBat[dp] < disVcut)         //if the latest measured voltage is less than the discharge cut off
-			state = CYCLE_DONE;                     //set state to 'cycle done'
-			doneReason = DROPOUT;
-
 		//check for cell dropout
-		if (VBat[dp] < 7200)             //start checking when VBat is less than 7.2V
+		if (VBat[dp] < 7200)		//start checking when VBat is less than 7.2V
 		{
 			rateVBat = (VBat[dp] - preVBat)/periodSec; //calculate the instantaneous rate of Vbat change
-			if (rateVBat < VBatRateLimit){           		//if the battery voltage rate is less than the cellDropRate
+			if (rateVBat < VBatRateLimit){//if the battery voltage rate is less than the cellDropRate
 				state = CYCLE_DONE;
 				doneReason = DROPOUT;
 			}
 			preVBat = VBat[dp];
+		//else if battery voltage less than discharge voltage threshold
+		}else if (VBat[dp] < disVcut){//if the latest measured voltage is less than the discharge cut off
+			state = VBAT_CUT;			//set state to 'cycle done'
+			doneReason = DROPOUT;		//set doneReason
+		//else if the discharge timeout is reached
+		}else if ((timeStamp[dp]*interval) >= (disTimeout*60*interval)){
+			state = CYCLE_DONE;			//set state to 'cycle done'
+			doneReason = TIMEOUT;		//set doneReason
+		//else if the capacity limit is reached
+		}else if (intCapacity > disCapLimit){
+			state = CYCLE_DONE;			//set sstate to 'cycle done'
+			doneReason = OVER_CAPACITY;	//set doneReason
 		}
 	}
 }
@@ -274,7 +286,11 @@ static void Iterate_PID(void){
 	}
 }
 
-static void LogToFile() {
+static void Err(void){//error function used by LogToFile
+  for(;;){}
+}
+
+static void LogToFile(){	//log data to file on uSD
   uint8_t write_buf[48];
   UINT bw;
   TIMEREC time;
@@ -300,11 +316,15 @@ static void LogToFile() {
   UTIL1_strcatNum8u(write_buf, sizeof(write_buf), time.Sec);
   UTIL1_chcat(write_buf, sizeof(write_buf), '\t');
 
-  UTIL1_strcatNum16s(write_buf, sizeof(write_buf), x);
+  UTIL1_strcatNum32s(write_buf, sizeof(write_buf), timeStamp[dp]);
   UTIL1_chcat(write_buf, sizeof(write_buf), '\t');
-  UTIL1_strcatNum16s(write_buf, sizeof(write_buf), y);
+  UTIL1_strcatNum32s(write_buf, sizeof(write_buf), current[dp]);
   UTIL1_chcat(write_buf, sizeof(write_buf), '\t');
-  UTIL1_strcatNum16s(write_buf, sizeof(write_buf), z);
+  UTIL1_strcatNum32s(write_buf, sizeof(write_buf), VBat[dp]);
+  UTIL1_chcat(write_buf, sizeof(write_buf), '\t');
+  UTIL1_strcatNum32s(write_buf, sizeof(write_buf), intCapacity);
+  UTIL1_chcat(write_buf, sizeof(write_buf), '\t');
+  UTIL1_strcatNum32s(write_buf, sizeof(write_buf), temp[dp]);
   UTIL1_strcat(write_buf, sizeof(write_buf), (unsigned char*)"\r\n");
   if (FAT1_write(&fp, write_buf, UTIL1_strlen((char*)write_buf), &bw)!=FR_OK) {
     (void)FAT1_close(&fp);
@@ -405,6 +425,9 @@ byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOT
   }else if (UTIL1_strcmp((char*)cmd, "BTS verbose")==0) {
 	    *handled = TRUE;
 	    return Toggle_Verbose();
+  }else if (UTIL1_strcmp((char*)cmd, "BTS logging")==0) {
+  	    *handled = TRUE;
+  	    return Toggle_Logging();
   } /* else if (UTIL1_strncmp((char*)cmd, "FAT1 copy", sizeof("FAT1 copy")-1)==0) {
     *handled = TRUE;
     return CopyCmd(cmd+sizeof("FAT1"), io);
@@ -445,25 +468,26 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io) {
   CLS1_SendHelpStr((unsigned char*)"  stop", (const unsigned char*)"stop test and save data\r\n", io->stdOut);
   CLS1_SendHelpStr((unsigned char*)"  break", (const unsigned char*)"stop test and discard data\r\n", io->stdOut);
   CLS1_SendHelpStr((unsigned char*)"  verbose", (const unsigned char*)"toggle print log to shell\r\n", io->stdOut);
+  CLS1_SendHelpStr((unsigned char*)"  logging", (const unsigned char*)"toggle log data to uSD\r\n", io->stdOut);
   return ERR_OK;
 }
 
 //used by BTS_ParseCommand to print status message
 static uint8_t PrintStatus(const CLS1_StdIOType *io) {
-	int intCapacity = (int) capacity; 			//convert capacity to int
-	int32_t duration = timeStamp[dp];
+
+	//int32_t duration = timeStamp[dp];
 	//CLS1_SendStatusStr((unsigned char*)"BTS", (unsigned char*)"\r\n", io->stdOut);
-	UTIL1_Num32sToStr(charBuff,64,state);
+	UTIL1_Num32sToStr(charBuff,sizeof(charBuff),state);
 	CLS1_SendStatusStr((unsigned char*)"  mode", charBuff, io->stdOut);
-	UTIL1_Num32sToStr(charBuff,64,current[dp]);
+	UTIL1_Num32sToStr(charBuff,sizeof(charBuff),timeStamp[dp]);
+	CLS1_SendStatusStr((unsigned char*)"  Loops", charBuff, io->stdOut);
+	UTIL1_Num32sToStr(charBuff,sizeof(charBuff),current[dp]);
 	CLS1_SendStatusStr((unsigned char*)"  Ibat[mA]", charBuff, io->stdOut);
-	UTIL1_Num32sToStr(charBuff,64,VBat[dp]);
+	UTIL1_Num32sToStr(charBuff,sizeof(charBuff),VBat[dp]);
 	CLS1_SendStatusStr((unsigned char*)"  Vbat[mV]", charBuff, io->stdOut);
-	UTIL1_Num32sToStr(charBuff,64,duration);
-	CLS1_SendStatusStr((unsigned char*)"  duration[s]", charBuff, io->stdOut);
-	UTIL1_Num32sToStr(charBuff,64,intCapacity);
+	UTIL1_Num32sToStr(charBuff,sizeof(charBuff),intCapacity);
 	CLS1_SendStatusStr((unsigned char*)"  cap[mAh]", charBuff, io->stdOut);
-	UTIL1_Num32sToStr(charBuff,64,temp[dp]);
+	UTIL1_Num32sToStr(charBuff,sizeof(charBuff),temp[dp]);
 	CLS1_SendStatusStr((unsigned char*)"  batTemp[C]", charBuff, io->stdOut);
 	CLS1_SendStr((unsigned char*)"\r\n", io->stdOut);
 	return ERR_OK;
@@ -539,13 +563,24 @@ static uint8_t Stop(const CLS1_StdIOType *io){
 	return ERR_OK;
 }
 
-//command for stopping
+//command for toggling verbose mode
 static uint8_t Toggle_Verbose(){
 
 	if (verbose == 1)
 		verbose = 0;
 	else
 		verbose = 1;
+
+	return ERR_OK;
+}
+
+//command for stopping
+static uint8_t Toggle_Logging(){
+
+	if (logEnabled == 1)
+		logEnabled = 0;
+	else
+		logEnabled = 1;
 
 	return ERR_OK;
 }

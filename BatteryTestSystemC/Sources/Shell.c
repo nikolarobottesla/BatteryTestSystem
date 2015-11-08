@@ -45,6 +45,7 @@ static portTASK_FUNCTION(ShellTask, pvParameters) {
 #if PL_HAS_SD_CARD
   bool cardMounted = FALSE;
   static FAT1_FATFS fileSystemObject;
+  bool lastCardState = FALSE;			//indicates the state of the SD from the last loop
 #endif
   unsigned char buf[48];
 
@@ -58,13 +59,16 @@ static portTASK_FUNCTION(ShellTask, pvParameters) {
 #if PL_HAS_SD_CARD
     (void)FAT1_CheckCardPresence(&cardMounted,
         "0" /* drive */, &fileSystemObject, CLS1_GetStdio());
-    if (cardMounted) {
-      //SD_GreenLed_On();
-      //SD_RedLed_Off();
-    } else {
-      //SD_GreenLed_Off();
-      //SD_RedLed_On();
+
+    if(cardMounted != lastCardState){
+		if (cardMounted == 1) {
+			CLS1_SendStr((unsigned char*)"**Card inserted**\r\n", CLS1_GetStdio());
+		} else {
+			CLS1_SendStr((unsigned char*)"**Card removed**\r\n", CLS1_GetStdio());
+		}
+		lastCardState = cardMounted;	//update last card state
     }
+
 #endif
     (void)CLS1_ReadAndParseWithCommandTable(buf, sizeof(buf), CLS1_GetStdio(), CmdParserTable);
     FRTOS1_vTaskDelay(200/portTICK_RATE_MS);
