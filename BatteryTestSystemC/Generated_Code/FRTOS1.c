@@ -7,7 +7,7 @@
 **     Version     : Component 01.438, Driver 01.00, CPU db: 3.00.000
 **     Repository  : mcuoneclipse
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-11-01, 20:19, # CodeGen: 40
+**     Date/Time   : 2015-11-08, 22:04, # CodeGen: 44
 **     Abstract    :
 **          This component implements the FreeRTOS Realtime Operating System
 **     Settings    :
@@ -31,11 +31,11 @@
 **            ColdFire V1                                  : Disabled
 **            ColdFire V2                                  : Disabled
 **            Kinetis                                      : Enabled
-**              ARM Family                                 : Cortex-M0+
+**              ARM Family                                 : Cortex-M4
 **              Floating Point Support                     : no
 **              Max SysCall Interrupt Priority             : 1
 **              RTOS Interrupt Priority                    : 3
-**              Lowest Interrupt Priority                  : 3
+**              Lowest Interrupt Priority                  : 15
 **              Compiler Optimization Level                : 0
 **              SysTick                                    : Enabled
 **                Core Clock                               : yes

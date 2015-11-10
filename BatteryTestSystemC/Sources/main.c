@@ -47,6 +47,7 @@
 #include "CLS1.h"
 #include "SD1.h"
 #include "SS1.h"
+#include "CD1.h"
 #include "CS1.h"
 #include "SM1.h"
 #include "SMasterLdd1.h"

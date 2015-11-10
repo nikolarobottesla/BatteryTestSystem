@@ -50,6 +50,7 @@
 #include "CLS1.h"
 #include "SD1.h"
 #include "SS1.h"
+#include "CD1.h"
 #include "CS1.h"
 #include "SM1.h"
 #include "SMasterLdd1.h"
@@ -200,6 +201,41 @@ void AD1_OnCalibrationEnd(void);
 **         User should check if the calibration pass or fail by
 **         Calibration status method./nThis event is enabled only if
 **         the <Interrupt service/event> property is enabled.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+
+void SM1_OnFullRxBuf(void);
+/*
+** ===================================================================
+**     Event       :  SM1_OnFullRxBuf (module Events)
+**
+**     Component   :  SM1 [SynchroMaster]
+**     Description :
+**         This event is called when the input buffer is full, i.e.
+**         after reception of the last character that was successfully
+**         placed into input buffer.
+**         This event is available only when the <Interrupt
+**         service/event> property is enabled and the <Input buffer
+**         size> property is set to non-zero value.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+
+void SM1_OnFreeTxBuf(void);
+/*
+** ===================================================================
+**     Event       :  SM1_OnFreeTxBuf (module Events)
+**
+**     Component   :  SM1 [SynchroMaster]
+**     Description :
+**         This event is called after the last character in output
+**         buffer is transmitted.
+**         This event is available only when the <Interrupt
+**         service/event> property is enabled and the <Output buffer
+**         size> property is set to non-zero value.
 **     Parameters  : None
 **     Returns     : Nothing
 ** ===================================================================

@@ -135,11 +135,11 @@ PE_DEBUGHALT();
         <boolgroup name="ColdFire V1" v="Disabled" />
         <boolgroup name="ColdFire V2" v="Disabled" />
         <boolgroup name="Kinetis" v="Enabled">
-          <ARM_Family v="Cortex-M0+" />
+          <ARM_Family v="Cortex-M4" />
           <Floating_Point_Support v="no" />
           <Max_SysCall_Interrupt_Priority v="1" />
           <RTOS_Interrupt_Priority v="3" />
-          <Lowest_Interrupt_Priority v="3" />
+          <Lowest_Interrupt_Priority v="15" />
           <Compiler_Optimization_Level v="0" />
           <boolgroup name="SysTick" v="Enabled">
             <Core_Clock v="yes" />
@@ -953,7 +953,7 @@ PE_DEBUGHALT();
       <Silent_Mode_Prefix v="#" />
       <boolgroup name="Blocking Send" v="Enabled">
         <Wait v="WAIT1" />
-        <Wait_Time__ms_ v="100" />
+        <Wait_Time__ms_ v="200" />
         <RTOS_Wait v="yes" />
       </boolgroup>
       <Status_Colon_Pos v="13" />
@@ -1064,7 +1064,45 @@ PE_DEBUGHALT();
           <boolgroup name="non-LDD SS" v="Disabled" />
         </boolgroup>
         <boolgroup name="Activate" v="Disabled" />
-        <boolgroup name="Card detection" v="Disabled" />
+        <boolgroup name="Card detection" v="Enabled">
+          <Card_Detect_is_LOW_active v="yes" />
+          <boolgroup name="LDD CD" v="Enabled">
+            <inhrbean type="BitIO_LDD">
+              <Enabled v="Y" />
+              <Template v="LDDCDI" />
+              <Properties>
+                <Component_name v="CD1" />
+                <Pin_for_I_O v="PTC16" />
+                <Direction v="Input" />
+                <group name="Initialization">
+                  <Init__direction v="Input" />
+                  <Init__value v="0" />
+                  <Auto_initialization v="yes" />
+                </group>
+                <Safe_mode v="no" />
+              </Properties>
+              <Methods>
+                <Init v="generate code" />
+                <Deinit v="generate code" />
+                <GetDir v="don&amp;apos;t generate code" />
+                <SetDir v="don&amp;apos;t generate code" />
+                <SetInput v="don&amp;apos;t generate code" />
+                <SetOutput v="don&amp;apos;t generate code" />
+                <GetVal v="generate code" />
+                <PutVal v="don&amp;apos;t generate code" />
+                <ClrVal v="don&amp;apos;t generate code" />
+                <SetVal v="don&amp;apos;t generate code" />
+                <NegVal v="don&amp;apos;t generate code" />
+                <ConnectPin v="don&amp;apos;t generate code" />
+                <GetRawVal v="don&amp;apos;t generate code" />
+              </Methods>
+              <Events>
+                <EmptySection_DummyValue />
+              </Events>
+            </inhrbean>
+          </boolgroup>
+          <boolgroup name="non-LDD CD" v="Disabled" />
+        </boolgroup>
         <Report__Card_present__if_no_Card_detection_pin v="yes" />
         <boolgroup name="Write protection" v="Disabled" />
       </group>
@@ -1128,8 +1166,8 @@ PE_DEBUGHALT();
         <Interrupt_input_priority v="medium priority" />
         <Interrupt_from_output v="INT_SPI0" />
         <Interrupt_output_priority v="medium priority" />
-        <Input_buffer_size v="0" />
-        <Output_buffer_size v="0" />
+        <Input_buffer_size v="128" />
+        <Output_buffer_size v="128" />
       </boolgroup>
       <group name="Settings">
         <Width v="8 bits" />
@@ -1173,13 +1211,13 @@ PE_DEBUGHALT();
             </boolgroup>
             <group name="Settings">
               <boolgroup name="Input pin" v="Enabled">
-                <Pin v="PTA16/SPI0_MOSI/SPI0_MISO" />
+                <Pin v="PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI" />
               </boolgroup>
               <boolgroup name="Output pin" v="Enabled">
-                <Pin v="PTA17/SPI0_MISO/SPI0_MOSI" />
+                <Pin v="PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO" />
               </boolgroup>
               <group name="Clock pin">
-                <Pin v="PTA15/SPI0_SCK/UART0_RX" />
+                <Pin v="ADC0_SE5b/PTD1/SPI0_SCK/TPM0_CH1" />
               </group>
               <list name="Chip select list" v="0">
                 <EmptySection_DummyValue />
@@ -1322,10 +1360,10 @@ PE_DEBUGHALT();
       <DisableEvent v="don&amp;apos;t generate code" />
       <RecvChar v="generate code" />
       <SendChar v="generate code" />
-      <RecvBlock v="don&amp;apos;t generate code" />
-      <SendBlock v="don&amp;apos;t generate code" />
-      <ClearRxBuf v="don&amp;apos;t generate code" />
-      <ClearTxBuf v="don&amp;apos;t generate code" />
+      <RecvBlock v="generate code" />
+      <SendBlock v="generate code" />
+      <ClearRxBuf v="generate code" />
+      <ClearTxBuf v="generate code" />
       <CharsInRxBuf v="don&amp;apos;t generate code" />
       <GetCharsInRxBuf v="generate code" />
       <CharsInTxBuf v="don&amp;apos;t generate code" />
@@ -1349,8 +1387,14 @@ PE_DEBUGHALT();
         <Event_procedure_name v="SM1_OnTxChar" />
         <Priority v="interrupts disabled" />
       </event>
-      <event name="OnFullRxBuf" v="don&amp;apos;t generate code" />
-      <event name="OnFreeTxBuf" v="don&amp;apos;t generate code" />
+      <event name="OnFullRxBuf" v="generate code">
+        <Event_procedure_name v="SM1_OnFullRxBuf" />
+        <Priority v="interrupts disabled" />
+      </event>
+      <event name="OnFreeTxBuf" v="generate code">
+        <Event_procedure_name v="SM1_OnFreeTxBuf" />
+        <Priority v="interrupts disabled" />
+      </event>
       <event name="OnError" v="generate code">
         <Event_procedure_name v="SM1_OnError" />
         <Priority v="interrupts disabled" />

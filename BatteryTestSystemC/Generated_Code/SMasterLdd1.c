@@ -7,7 +7,7 @@
 **     Version     : Component 01.111, Driver 01.02, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-25, 05:31, # CodeGen: 1
+**     Date/Time   : 2015-11-09, 21:04, # CodeGen: 46
 **     Abstract    :
 **         This component "SPIMaster_LDD" implements MASTER part of synchronous
 **         serial master-slave communication.
@@ -21,13 +21,13 @@
 **            Output interrupt priority                    : medium priority
 **          Settings                                       : 
 **            Input pin                                    : Enabled
-**              Pin                                        : PTA16/SPI0_MOSI/SPI0_MISO
+**              Pin                                        : PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI
 **              Pin signal                                 : 
 **            Output pin                                   : Enabled
-**              Pin                                        : PTA17/SPI0_MISO/SPI0_MOSI
+**              Pin                                        : PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO
 **              Pin signal                                 : 
 **            Clock pin                                    : 
-**              Pin                                        : PTA15/SPI0_SCK/UART0_RX
+**              Pin                                        : ADC0_SE5b/PTD1/SPI0_SCK/TPM0_CH1
 **              Pin signal                                 : 
 **            Chip select list                             : 0
 **            Attribute set list                           : 8
@@ -280,27 +280,27 @@ LDD_TDeviceData* SMasterLdd1_Init(LDD_TUserData *UserDataPtr)
               ));
   /* NVIC_ISER: SETENA|=0x0400 */
   NVIC_ISER |= NVIC_ISER_SETENA(0x0400);
-  /* PORTA_PCR16: ISF=0,MUX=5 */
-  PORTA_PCR16 = (uint32_t)((PORTA_PCR16 & (uint32_t)~(uint32_t)(
-                 PORT_PCR_ISF_MASK |
-                 PORT_PCR_MUX(0x02)
-                )) | (uint32_t)(
-                 PORT_PCR_MUX(0x05)
-                ));
-  /* PORTA_PCR17: ISF=0,MUX=5 */
-  PORTA_PCR17 = (uint32_t)((PORTA_PCR17 & (uint32_t)~(uint32_t)(
-                 PORT_PCR_ISF_MASK |
-                 PORT_PCR_MUX(0x02)
-                )) | (uint32_t)(
-                 PORT_PCR_MUX(0x05)
-                ));
-  /* PORTA_PCR15: ISF=0,MUX=2 */
-  PORTA_PCR15 = (uint32_t)((PORTA_PCR15 & (uint32_t)~(uint32_t)(
-                 PORT_PCR_ISF_MASK |
-                 PORT_PCR_MUX(0x05)
-                )) | (uint32_t)(
-                 PORT_PCR_MUX(0x02)
-                ));
+  /* PORTD_PCR3: ISF=0,MUX=2 */
+  PORTD_PCR3 = (uint32_t)((PORTD_PCR3 & (uint32_t)~(uint32_t)(
+                PORT_PCR_ISF_MASK |
+                PORT_PCR_MUX(0x05)
+               )) | (uint32_t)(
+                PORT_PCR_MUX(0x02)
+               ));
+  /* PORTD_PCR2: ISF=0,MUX=2 */
+  PORTD_PCR2 = (uint32_t)((PORTD_PCR2 & (uint32_t)~(uint32_t)(
+                PORT_PCR_ISF_MASK |
+                PORT_PCR_MUX(0x05)
+               )) | (uint32_t)(
+                PORT_PCR_MUX(0x02)
+               ));
+  /* PORTD_PCR1: ISF=0,MUX=2 */
+  PORTD_PCR1 = (uint32_t)((PORTD_PCR1 & (uint32_t)~(uint32_t)(
+                PORT_PCR_ISF_MASK |
+                PORT_PCR_MUX(0x05)
+               )) | (uint32_t)(
+                PORT_PCR_MUX(0x02)
+               ));
   /* SPI0_C1: SPIE=0,SPE=0,SPTIE=0,MSTR=1,CPOL=0,CPHA=1,SSOE=1,LSBFE=0 */
   SPI0_C1 = (SPI_C1_MSTR_MASK | SPI_C1_CPHA_MASK | SPI_C1_SSOE_MASK); /* Set configuration register */
   /* SPI0_C2: SPMIE=0,??=0,TXDMAE=0,MODFEN=1,BIDIROE=0,RXDMAE=0,SPISWAI=0,SPC0=0 */

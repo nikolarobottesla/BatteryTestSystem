@@ -7,7 +7,7 @@
 **     Version     : Component 01.178, Driver 01.00, CPU db: 3.00.000
 **     Repository  : mcuoneclipse
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-11-01, 17:23, # CodeGen: 39
+**     Date/Time   : 2015-11-09, 19:47, # CodeGen: 45
 **     Abstract    :
 **         Implements interface to SD card for FatFs
 **     Settings    :
@@ -32,7 +32,11 @@
 **                Slave Select Pin                         : LDDSS
 **              non-LDD SS                                 : Disabled
 **            Activate                                     : Disabled
-**            Card detection                               : Disabled
+**            Card detection                               : Enabled
+**              Card Detect is LOW active                  : yes
+**              LDD CD                                     : Enabled
+**                Card detection pin                       : LDDCDI
+**              non-LDD CD                                 : Disabled
 **            Report 'Card present' if no Card detection pin: yes
 **            Write protection                             : Disabled
 **          System                                         : 
@@ -88,6 +92,7 @@
 /* Include inherited beans */
 #include "SM1.h"
 #include "SS1.h"
+#include "CD1.h"
 #include "WAIT1.h"
 #include "TMOUT1.h"
 #include "FRTOS1.h"
@@ -297,7 +302,7 @@ byte SD1_ReceiveByte(void);
 */
 
 #define SD1_CardPresent() \
-  TRUE                                  /* no card detection pin, but user wants to report TRUE */
+  (bool)(CD1_GetVal(CD1_DeviceData)==0) /* low level means card present */
 
 /*
 ** ===================================================================

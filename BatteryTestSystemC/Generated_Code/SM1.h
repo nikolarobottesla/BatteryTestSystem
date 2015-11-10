@@ -7,7 +7,7 @@
 **     Version     : Component 02.347, Driver 01.01, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-07-25, 10:03, # CodeGen: 3
+**     Date/Time   : 2015-11-09, 21:04, # CodeGen: 46
 **     Abstract    :
 **         This component "SynchroMaster" implements MASTER part of synchronous
 **         serial master-slave communication.
@@ -20,8 +20,8 @@
 **            Interrupt input priority                     : medium priority
 **            Interrupt from output                        : INT_SPI0
 **            Interrupt output priority                    : medium priority
-**            Input buffer size                            : 0
-**            Output buffer size                           : 0
+**            Input buffer size                            : 128
+**            Output buffer size                           : 128
 **          Settings                                       : 
 **            Width                                        : 8 bits
 **            Input pin                                    : Enabled
@@ -54,6 +54,10 @@
 **         Disable               - byte SM1_Disable(void);
 **         RecvChar              - byte SM1_RecvChar(SM1_TComData *Chr);
 **         SendChar              - byte SM1_SendChar(SM1_TComData Chr);
+**         RecvBlock             - byte SM1_RecvBlock(SM1_TComData *Ptr, word Size, word *Rcv);
+**         SendBlock             - byte SM1_SendBlock(SM1_TComData *Ptr, word Size, word *Snd);
+**         ClearRxBuf            - byte SM1_ClearRxBuf(void);
+**         ClearTxBuf            - byte SM1_ClearTxBuf(void);
 **         GetCharsInRxBuf       - word SM1_GetCharsInRxBuf(void);
 **         GetCharsInTxBuf       - word SM1_GetCharsInTxBuf(void);
 **         SetBaudRateMode       - byte SM1_SetBaudRateMode(byte Mod);
@@ -141,6 +145,8 @@ extern "C" {
 #endif
 
 #define SM1_EOF 0                      /* Value of the empty character defined in the <a href="SynchroMasterProperties.html#EOF">Empty character</a> property. */
+#define SM1_INP_BUF_SIZE 128U          /* Input buffer size */
+#define SM1_OUT_BUF_SIZE 128U          /* Output buffer size */
 
 byte SM1_Enable(void);
 /*
@@ -239,6 +245,115 @@ byte SM1_SendChar(SM1_TComData Chr);
 **                           ERR_DISABLED - Device is disabled (only if
 **                           output DMA is supported and enabled)
 **                           ERR_TXFULL - Transmitter is full
+** ===================================================================
+*/
+
+byte SM1_RecvBlock(SM1_TComData *Ptr,word Size,word *Rcv);
+/*
+** ===================================================================
+**     Method      :  SM1_RecvBlock (component SynchroMaster)
+**     Description :
+**         If any data received, this method returns the block of the
+**         data and its length (and incidental error), otherwise it
+**         returns error code (it does not wait for data).
+**         If less than requested number of characters is received only
+**         the available data is copied from the receive buffer to the
+**         user specified destination and the ERR_EXEMPTY value is
+**         returned.
+**         This method is available only if non-zero length of input
+**         buffer is defined.
+**         For information about SW overrun behavior please see
+**         <General info page>.
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**       * Ptr             - A pointer to the block of received data
+**         Size            - The size of the block
+**       * Rcv             - Pointer to a variable where an actual
+**                           number of copied characters is stored
+**     Returns     :
+**         ---             - Error code, possible codes:
+**                           ERR_OK - OK - The valid data is received.
+**                           ERR_SPEED - This device does not work in
+**                           the active speed mode.
+**                           ERR_RXEMPTY - It was not possible to read
+**                           requested number of bytes from the buffer.
+**                           ERR_OVERRUN - Overrun error was detected
+**                           from the last char or block received. If
+**                           interrupt service is enabled, and input
+**                           buffer allocated by the component is full,
+**                           the component behaviour depends on <Input
+**                           buffer size> property : if property is 0,
+**                           last received data-word is preserved (and
+**                           previous is overwritten), if property is
+**                           greater than 0, new received data-word are
+**                           ignored.
+**                           ERR_FAULT - Fault error was detected from
+**                           the last char or block received. In the
+**                           polling mode the ERR_FAULT is return until
+**                           the user clear the fault flag bit, but in
+**                           the interrupt mode ERR_FAULT is returned
+**                           only once after the fault error occured.
+**                           This error is supported only on the CPUs
+**                           supports the faul mode function - where
+**                           <Fault mode> property is available.
+** ===================================================================
+*/
+
+byte SM1_SendBlock(SM1_TComData *Ptr,word Size,word *Snd);
+/*
+** ===================================================================
+**     Method      :  SM1_SendBlock (component SynchroMaster)
+**     Description :
+**         Send a block of characters to the channel. This method is
+**         only available if a non-zero length of output buffer is
+**         defined.
+**     Parameters  :
+**         NAME            - DESCRIPTION
+**       * Ptr             - Pointer to the block of data to send
+**         Size            - Size of the block
+**       * Snd             - Pointer to number of data that are sent
+**                           (moved to buffer)
+**     Returns     :
+**         ---             - Error code, possible codes:
+**                           ERR_OK - OK
+**                           ERR_SPEED - This device does not work in
+**                           the active speed mode
+**                           ERR_DISABLED - Device is disabled (only if
+**                           output DMA is supported and enabled)
+**                           ERR_TXFULL - It was not possible to send
+**                           requested number of bytes
+** ===================================================================
+*/
+
+byte SM1_ClearRxBuf(void);
+/*
+** ===================================================================
+**     Method      :  SM1_ClearRxBuf (component SynchroMaster)
+**     Description :
+**         Clears the receive buffer. This method is available only if
+**         a non-zero length of input buffer is defined.
+**     Parameters  : None
+**     Returns     :
+**         ---             - Error code, possible codes:
+**                           ERR_OK - OK
+**                           ERR_SPEED - This device does not work in
+**                           the active speed mode
+** ===================================================================
+*/
+
+byte SM1_ClearTxBuf(void);
+/*
+** ===================================================================
+**     Method      :  SM1_ClearTxBuf (component SynchroMaster)
+**     Description :
+**         Clears the transmit buffer. This method is only available if
+**         a non-zero length of output buffer is defined.
+**     Parameters  : None
+**     Returns     :
+**         ---             - Error code, possible codes:
+**                           ERR_OK - OK
+**                           ERR_SPEED - This device does not work in
+**                           the active speed mode
 ** ===================================================================
 */
 

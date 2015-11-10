@@ -135,11 +135,11 @@ PE_DEBUGHALT();
         <boolgroup name="ColdFire V1" v="Disabled" />
         <boolgroup name="ColdFire V2" v="Disabled" />
         <boolgroup name="Kinetis" v="Enabled">
-          <ARM_Family v="Cortex M0+" />
+          <ARM_Family v="Cortex-M4" />
           <Floating_Point_Support v="no" />
           <Max_SysCall_Interrupt_Priority v="1" />
           <RTOS_Interrupt_Priority v="3" />
-          <Lowest_Interrupt_Priority v="3" />
+          <Lowest_Interrupt_Priority v="15" />
           <Compiler_Optimization_Level v="0" />
           <boolgroup name="SysTick" v="Enabled">
             <Core_Clock v="yes" />
@@ -953,7 +953,7 @@ PE_DEBUGHALT();
       <Silent_Mode_Prefix v="#" />
       <boolgroup name="Blocking Send" v="Enabled">
         <Wait v="WAIT1" />
-        <Wait_Time__ms_ v="100" />
+        <Wait_Time__ms_ v="200" />
         <RTOS_Wait v="yes" />
       </boolgroup>
       <Status_Colon_Pos v="13" />
@@ -1064,7 +1064,45 @@ PE_DEBUGHALT();
           <boolgroup name="non-LDD SS" v="Disabled" />
         </boolgroup>
         <boolgroup name="Activate" v="Disabled" />
-        <boolgroup name="Card detection" v="Disabled" />
+        <boolgroup name="Card detection" v="Enabled">
+          <Card_Detect_is_LOW_active v="yes" />
+          <boolgroup name="LDD CD" v="Enabled">
+            <inhrbean type="BitIO_LDD">
+              <Enabled v="Y" />
+              <Template v="LDDCDI" />
+              <Properties>
+                <Component_name v="CD1" />
+                <Pin_for_I_O v="PTC16" />
+                <Direction v="Input" />
+                <group name="Initialization">
+                  <Init__direction v="Input" />
+                  <Init__value v="0" />
+                  <Auto_initialization v="yes" />
+                </group>
+                <Safe_mode v="no" />
+              </Properties>
+              <Methods>
+                <Init v="generate code" />
+                <Deinit v="generate code" />
+                <GetDir v="don&amp;apos;t generate code" />
+                <SetDir v="don&amp;apos;t generate code" />
+                <SetInput v="don&amp;apos;t generate code" />
+                <SetOutput v="don&amp;apos;t generate code" />
+                <GetVal v="generate code" />
+                <PutVal v="don&amp;apos;t generate code" />
+                <ClrVal v="don&amp;apos;t generate code" />
+                <SetVal v="don&amp;apos;t generate code" />
+                <NegVal v="don&amp;apos;t generate code" />
+                <ConnectPin v="don&amp;apos;t generate code" />
+                <GetRawVal v="don&amp;apos;t generate code" />
+              </Methods>
+              <Events>
+                <EmptySection_DummyValue />
+              </Events>
+            </inhrbean>
+          </boolgroup>
+          <boolgroup name="non-LDD CD" v="Disabled" />
+        </boolgroup>
         <Report__Card_present__if_no_Card_detection_pin v="yes" />
         <boolgroup name="Write protection" v="Disabled" />
       </group>

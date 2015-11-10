@@ -6,7 +6,7 @@
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-09-10, 22:39, # CodeGen: 24
+**     Date/Time   : 2015-11-08, 22:04, # CodeGen: 44
 **     Abstract    :
 **
 **     Settings    :
@@ -78,6 +78,7 @@
 #include "CLS1.h"
 #include "SD1.h"
 #include "SS1.h"
+#include "CD1.h"
 #include "CS1.h"
 #include "SM1.h"
 #include "SMasterLdd1.h"

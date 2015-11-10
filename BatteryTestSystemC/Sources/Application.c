@@ -424,10 +424,10 @@ byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOT
 	    return Stop(io);
   }else if (UTIL1_strcmp((char*)cmd, "BTS verbose")==0) {
 	    *handled = TRUE;
-	    return Toggle_Verbose();
+	    return Toggle_Verbose(io);
   }else if (UTIL1_strcmp((char*)cmd, "BTS logging")==0) {
   	    *handled = TRUE;
-  	    return Toggle_Logging();
+  	    return Toggle_Logging(io);
   } /* else if (UTIL1_strncmp((char*)cmd, "FAT1 copy", sizeof("FAT1 copy")-1)==0) {
     *handled = TRUE;
     return CopyCmd(cmd+sizeof("FAT1"), io);
@@ -564,23 +564,33 @@ static uint8_t Stop(const CLS1_StdIOType *io){
 }
 
 //command for toggling verbose mode
-static uint8_t Toggle_Verbose(){
+static uint8_t Toggle_Verbose(const CLS1_StdIOType *io){
 
-	if (verbose == 1)
+	if (verbose == 1){
 		verbose = 0;
-	else
+		CLS1_SendStr((unsigned char*)"verbose disabled\r\n", io->stdOut);
+	}
+
+	else{
 		verbose = 1;
+		CLS1_SendStr((unsigned char*)"verbose enabled\r\n", io->stdOut);
+	}
 
 	return ERR_OK;
 }
 
 //command for stopping
-static uint8_t Toggle_Logging(){
+static uint8_t Toggle_Logging(const CLS1_StdIOType *io){
 
-	if (logEnabled == 1)
-		logEnabled = 0;
-	else
-		logEnabled = 1;
+	if (logEnabled == 1){
+			logEnabled = 0;
+			CLS1_SendStr((unsigned char*)"logging disabled\r\n", io->stdOut);
+		}
+
+		else{
+			logEnabled = 1;
+			CLS1_SendStr((unsigned char*)"logging enabled\r\n", io->stdOut);
+		}
 
 	return ERR_OK;
 }

@@ -60,14 +60,15 @@ static portTASK_FUNCTION(ShellTask, pvParameters) {
     (void)FAT1_CheckCardPresence(&cardMounted,
         "0" /* drive */, &fileSystemObject, CLS1_GetStdio());
 
-    if(cardMounted != lastCardState){
+/*//causing a crash for some reason
+ * if(cardMounted != lastCardState){
 		if (cardMounted == 1) {
 			CLS1_SendStr((unsigned char*)"**Card inserted**\r\n", CLS1_GetStdio());
 		} else {
 			CLS1_SendStr((unsigned char*)"**Card removed**\r\n", CLS1_GetStdio());
 		}
 		lastCardState = cardMounted;	//update last card state
-    }
+    }*/
 
 #endif
     (void)CLS1_ReadAndParseWithCommandTable(buf, sizeof(buf), CLS1_GetStdio(), CmdParserTable);

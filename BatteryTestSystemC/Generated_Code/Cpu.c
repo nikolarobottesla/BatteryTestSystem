@@ -8,7 +8,7 @@
 **     Repository  : Kinetis
 **     Datasheet   : KL25P80M48SF0RM, Rev.3, Sep 2012
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-09-10, 22:39, # CodeGen: 24
+**     Date/Time   : 2015-11-08, 22:04, # CodeGen: 44
 **     Abstract    :
 **
 **     Settings    :
@@ -271,6 +271,7 @@
 #include "CLS1.h"
 #include "SD1.h"
 #include "SS1.h"
+#include "CD1.h"
 #include "CS1.h"
 #include "SM1.h"
 #include "SMasterLdd1.h"
@@ -1077,6 +1078,8 @@ void PE_low_level_init(void)
   SM1_Init();
   /* ### BitIO_LDD "SS1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
   (void)SS1_Init(NULL);
+  /* ### BitIO_LDD "CD1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
+  (void)CD1_Init(NULL);
   /* ### SD_Card "SD1" init code ... */
   /* ### FAT_FileSystem "FAT1" init code ... */
   /* ### PWM_LDD "PwmLdd1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
