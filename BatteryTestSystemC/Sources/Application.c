@@ -98,11 +98,11 @@ static portTASK_FUNCTION(control, pvParameters) {
 		  timeStamp[dp] = lastStamp + 1;	//increment timestamp
 
 		  Measure_All();
-		  Chk_Complete();
+//TODO	  //Chk_Complete();
 		  Iterate_PID();
 
 		  if (logEnabled == 1){		//if log is enabled
-			  LogToFile();				//log to file on uSD card
+			  Log_To_File();				//log to file on uSD card
 		  }
 
 		  if (verbose == 1){		//print status if verbose is set to 1
@@ -117,6 +117,8 @@ static portTASK_FUNCTION(control, pvParameters) {
 
 		  FRTOS1_vTaskDelayUntil(&xLastWakeTime, interval/portTICK_RATE_MS);	//using this vs TaskDelay to get a specific period
 	  }
+
+	  Stop_CHG_DIS();	//needed if cycle was stopped manually, also just to make double sure the PWM channels are off
 
 	  if ( doneReason > 0 ){
 		  State_Machine(CLS1_GetStdio());}		//choose what to do next
@@ -159,7 +161,7 @@ static void Load_Settings(void){
 }
 
 static void Measure_All(void){
-	//AD1_Measure(1);					//start adc conversion and wait till complete
+	AD1_Measure(1);					//start adc conversion and wait till complete
 	AD1_GetValue16(&rawADC[0]);		//put ADC values in array rawADC
 	VBat[dp] = rawADC[VBAT_SE] / (float)0xFFFF * 9900;	//measure the battery voltage, convert to mV, put in array
 	temp[dp] = rawADC[VTEMP] / (float)0xFFFF * 3300;	//measure the battery temp voltage, convert to mV, put in array
@@ -245,13 +247,11 @@ static void Iterate_PID(void){
 	float PID_output;		//Kp * err + (Ki * intError * dt) + (Kd * difError /dt);
 	uint16_t int_PID_out;	//stores the output as an integer
 
-	if (state<=1) {		//if off
-		Stop_CHG_DIS();		//make sure the output is off
+	if (state<=1) {		//if cycle done
+		Stop_CHG_DIS();		//stop current from flowing
 	}else				//else in charge mode or discharge mode
+
 	{
-
-
-
 		PID_error = PID_perCurrentSet - perCurrent; 				//calculate PID error
 		PID_intError = PID_intError + (PID_error * periodSec);		//calculate integral error
 		PID_output = PID_Kp * PID_error + PID_Ki * PID_intError;	//PWM output value
@@ -286,26 +286,27 @@ static void Iterate_PID(void){
 	}
 }
 
-static void Err(void){//error function used by LogToFile
-  for(;;){}
+static void Log_Error(void){//error function used by LogToFile
+	state = CYCLE_DONE;
+	doneReason = LOG_ERROR;
 }
 
-static void LogToFile(){	//log data to file on uSD
+static void Log_To_File(){	//log data to file on uSD
   uint8_t write_buf[48];
   UINT bw;
   TIMEREC time;
 
   /* open file */
   if (FAT1_open(&fp, "./log.txt", FA_OPEN_ALWAYS|FA_WRITE)!=FR_OK) {
-    Err();
+    Log_Error();
   }
   /* move to the end of the file */
   if (FAT1_lseek(&fp, fp.fsize) != FR_OK || fp.fptr != fp.fsize) {
-    Err();
+    Log_Error();
   }
   /* get time */
   if (TmDt1_GetTime(&time)!=ERR_OK) {
-    Err();
+    Log_Error();
   }
   /* write data */
   write_buf[0] = '\0';
@@ -328,7 +329,7 @@ static void LogToFile(){	//log data to file on uSD
   UTIL1_strcat(write_buf, sizeof(write_buf), (unsigned char*)"\r\n");
   if (FAT1_write(&fp, write_buf, UTIL1_strlen((char*)write_buf), &bw)!=FR_OK) {
     (void)FAT1_close(&fp);
-    Err();
+    Log_Error();
   }
   /* closing file */
   (void)FAT1_close(&fp);
@@ -428,10 +429,26 @@ byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOT
   }else if (UTIL1_strcmp((char*)cmd, "BTS logging")==0) {
   	    *handled = TRUE;
   	    return Toggle_Logging(io);
-  } /* else if (UTIL1_strncmp((char*)cmd, "FAT1 copy", sizeof("FAT1 copy")-1)==0) {
-    *handled = TRUE;
-    return CopyCmd(cmd+sizeof("FAT1"), io);
-  } else if (UTIL1_strncmp((char*)cmd, "FAT1 delete", sizeof("FAT1 delete")-1)==0) {
+  }else if (UTIL1_strncmp((char*)cmd, "BTS mode ", sizeof("BTS mode ")-1)==0) {
+		uint8_t res;
+		const unsigned char *p;
+		p = cmd+sizeof("BTS mode ")-1;
+		res = UTIL1_ScanDecimal32sNumber(&p, &firstState);
+		if (res!=ERR_OK) {
+		  CLS1_SendStr((unsigned char*)"*** invalid number format! Try e.g. 10\r\n", io->stdErr);
+		  return ERR_FAILED;}
+		if (firstState == CHG_MODE){
+			CLS1_SendStr((unsigned char*)"begin with charge\r\n", io->stdErr);
+		}else if(firstState == DIS_MODE){
+			CLS1_SendStr((unsigned char*)"begin with discharge\r\n", io->stdErr);
+		}else{
+			CLS1_SendStr((unsigned char*)"*** only valid options are 2 or 3\r\n", io->stdErr);
+			firstState = CHG_MODE;
+			CLS1_SendStr((unsigned char*)"first state set to charge mode\r\n", io->stdErr);
+		}
+		*handled = TRUE;
+		return ERR_OK;
+  } /* else if (UTIL1_strncmp((char*)cmd, "FAT1 delete", sizeof("FAT1 delete")-1)==0) {
     *handled = TRUE;
     return DeleteCmd(cmd+sizeof("FAT1"), io);
   } else if (UTIL1_strncmp((char*)cmd, "FAT1 mkdir", sizeof("FAT1 mkdir")-1)==0) {
@@ -455,6 +472,7 @@ byte BTS_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOT
   }*/
   return ERR_OK;
 }
+
 
 //used by BTS_ParseCommand to print help message
 static uint8_t PrintHelp(const CLS1_StdIOType *io) {
@@ -513,23 +531,26 @@ static void State_Machine(const CLS1_StdIOType *io){
 		nextState = CHG_MODE;
 		CLS1_SendStr((unsigned char*)"cell dropout occured, discharge cycle complete", io->stdOut);	//print status message
 	}else if (doneReason == TIMEOUT){
-		CLS1_SendStr((unsigned char*)"cycle ended due to timeout, aborting\r\n", io->stdOut);
+		CLS1_SendStr((unsigned char*)"cycle ended due to timeout\r\n", io->stdOut);
 		nextState = IDLE_MODE;
 	}else if (doneReason == OVER_TEMP){
-		CLS1_SendStr((unsigned char*)"cycle ended due to over temperature, aborting\r\n", io->stdOut);
+		CLS1_SendStr((unsigned char*)"cycle ended due to over temperature\r\n", io->stdOut);
 		nextState = IDLE_MODE;
 	}else if (doneReason == USER_COMMAND){
-		CLS1_SendStr((unsigned char*)"cycle ended due to user command, aborting\r\n", io->stdOut);
+		CLS1_SendStr((unsigned char*)"cycle ended due to user command\r\n", io->stdOut);
 		nextState = IDLE_MODE;
 	}else if (doneReason == OVER_CURRENT){
-		CLS1_SendStr((unsigned char*)"cycle ended due to over-current condition, aborting\r\n", io->stdOut);
+		CLS1_SendStr((unsigned char*)"cycle ended due to over-current condition\r\n", io->stdOut);
+		nextState = IDLE_MODE;
+	}else if (doneReason == LOG_ERROR){
+		CLS1_SendStr((unsigned char*)"cycle ended due to log error\r\n", io->stdOut);
 		nextState = IDLE_MODE;
 	}
 
 	if (doneReason <= DROPOUT){
 		waitTimeMs = waitTime * 60000;	//calculate wait time in ms
 		UTIL1_Num32uToStr(charBuff,64,waitTime);
-		CLS1_SendStatusStr((unsigned char*)"  waiting[min]", charBuff, io->stdOut);
+		CLS1_SendStatusStr((unsigned char*)" waiting[min]", charBuff, io->stdOut);
 		FRTOS1_vTaskDelay(waitTimeMs/portTICK_RATE_MS);	//wait between cycles
 	}
 
@@ -583,14 +604,14 @@ static uint8_t Toggle_Verbose(const CLS1_StdIOType *io){
 static uint8_t Toggle_Logging(const CLS1_StdIOType *io){
 
 	if (logEnabled == 1){
-			logEnabled = 0;
-			CLS1_SendStr((unsigned char*)"logging disabled\r\n", io->stdOut);
-		}
+		logEnabled = 0;
+		CLS1_SendStr((unsigned char*)"logging disabled\r\n", io->stdOut);
+	}
 
-		else{
-			logEnabled = 1;
-			CLS1_SendStr((unsigned char*)"logging enabled\r\n", io->stdOut);
-		}
+	else{
+		logEnabled = 1;
+		CLS1_SendStr((unsigned char*)"logging enabled\r\n", io->stdOut);
+	}
 
 	return ERR_OK;
 }

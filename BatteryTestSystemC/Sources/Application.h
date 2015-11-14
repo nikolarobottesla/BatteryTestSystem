@@ -35,6 +35,7 @@ void APP_Run(void);
 #define OVER_CAPACITY 6
 #define USER_COMMAND 7
 #define OVER_CURRENT 8
+#define LOG_ERROR 9
 
 //define ADC channels
 #define CHG_CURR 0
@@ -61,7 +62,7 @@ static uint8_t PrintStatus(const CLS1_StdIOType *io);
 static void Load_Current(int newCurrent);
 static uint8_t Toggle_Verbose();
 static uint8_t Toggle_Logging();
-static void LogToFile();
+static void Log_To_File();
 
 
 
