@@ -7,7 +7,7 @@
 **     Version     : Component 01.111, Driver 01.02, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-11-09, 21:04, # CodeGen: 46
+**     Date/Time   : 2015-11-15, 09:37, # CodeGen: 44
 **     Abstract    :
 **         This component "SPIMaster_LDD" implements MASTER part of synchronous
 **         serial master-slave communication.
@@ -21,13 +21,13 @@
 **            Output interrupt priority                    : medium priority
 **          Settings                                       : 
 **            Input pin                                    : Enabled
-**              Pin                                        : PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI
+**              Pin                                        : PTA16/SPI0_MOSI/SPI0_MISO
 **              Pin signal                                 : 
 **            Output pin                                   : Enabled
-**              Pin                                        : PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO
+**              Pin                                        : PTA17/SPI0_MISO/SPI0_MOSI
 **              Pin signal                                 : 
 **            Clock pin                                    : 
-**              Pin                                        : ADC0_SE5b/PTD1/SPI0_SCK/TPM0_CH1
+**              Pin                                        : PTA15/SPI0_SCK/UART0_RX
 **              Pin signal                                 : 
 **            Chip select list                             : 0
 **            Attribute set list                           : 8

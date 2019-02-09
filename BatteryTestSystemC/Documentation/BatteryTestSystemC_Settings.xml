@@ -1065,7 +1065,7 @@ PE_DEBUGHALT();
         </boolgroup>
         <boolgroup name="Activate" v="Disabled" />
         <boolgroup name="Card detection" v="Enabled">
-          <Card_Detect_is_LOW_active v="yes" />
+          <Card_Detect_is_LOW_active v="no" />
           <boolgroup name="LDD CD" v="Enabled">
             <inhrbean type="BitIO_LDD">
               <Enabled v="Y" />
@@ -1166,8 +1166,8 @@ PE_DEBUGHALT();
         <Interrupt_input_priority v="medium priority" />
         <Interrupt_from_output v="INT_SPI0" />
         <Interrupt_output_priority v="medium priority" />
-        <Input_buffer_size v="128" />
-        <Output_buffer_size v="128" />
+        <Input_buffer_size v="0" />
+        <Output_buffer_size v="0" />
       </boolgroup>
       <group name="Settings">
         <Width v="8 bits" />
@@ -1211,13 +1211,13 @@ PE_DEBUGHALT();
             </boolgroup>
             <group name="Settings">
               <boolgroup name="Input pin" v="Enabled">
-                <Pin v="PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI" />
+                <Pin v="PTA16/SPI0_MOSI/SPI0_MISO" />
               </boolgroup>
               <boolgroup name="Output pin" v="Enabled">
-                <Pin v="PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO" />
+                <Pin v="PTA17/SPI0_MISO/SPI0_MOSI" />
               </boolgroup>
               <group name="Clock pin">
-                <Pin v="ADC0_SE5b/PTD1/SPI0_SCK/TPM0_CH1" />
+                <Pin v="PTA15/SPI0_SCK/UART0_RX" />
               </group>
               <list name="Chip select list" v="0">
                 <EmptySection_DummyValue />
@@ -1360,10 +1360,10 @@ PE_DEBUGHALT();
       <DisableEvent v="don&amp;apos;t generate code" />
       <RecvChar v="generate code" />
       <SendChar v="generate code" />
-      <RecvBlock v="generate code" />
-      <SendBlock v="generate code" />
-      <ClearRxBuf v="generate code" />
-      <ClearTxBuf v="generate code" />
+      <RecvBlock v="don&amp;apos;t generate code" />
+      <SendBlock v="don&amp;apos;t generate code" />
+      <ClearRxBuf v="don&amp;apos;t generate code" />
+      <ClearTxBuf v="don&amp;apos;t generate code" />
       <CharsInRxBuf v="don&amp;apos;t generate code" />
       <GetCharsInRxBuf v="generate code" />
       <CharsInTxBuf v="don&amp;apos;t generate code" />
@@ -1387,14 +1387,8 @@ PE_DEBUGHALT();
         <Event_procedure_name v="SM1_OnTxChar" />
         <Priority v="interrupts disabled" />
       </event>
-      <event name="OnFullRxBuf" v="generate code">
-        <Event_procedure_name v="SM1_OnFullRxBuf" />
-        <Priority v="interrupts disabled" />
-      </event>
-      <event name="OnFreeTxBuf" v="generate code">
-        <Event_procedure_name v="SM1_OnFreeTxBuf" />
-        <Priority v="interrupts disabled" />
-      </event>
+      <event name="OnFullRxBuf" v="don&amp;apos;t generate code" />
+      <event name="OnFreeTxBuf" v="don&amp;apos;t generate code" />
       <event name="OnError" v="generate code">
         <Event_procedure_name v="SM1_OnError" />
         <Priority v="interrupts disabled" />

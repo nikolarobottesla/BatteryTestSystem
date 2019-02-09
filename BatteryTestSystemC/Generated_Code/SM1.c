@@ -7,7 +7,7 @@
 **     Version     : Component 02.347, Driver 01.01, CPU db: 3.00.000
 **     Repository  : Kinetis
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-11-09, 21:04, # CodeGen: 46
+**     Date/Time   : 2015-11-15, 09:37, # CodeGen: 44
 **     Abstract    :
 **         This component "SynchroMaster" implements MASTER part of synchronous
 **         serial master-slave communication.
@@ -20,8 +20,8 @@
 **            Interrupt input priority                     : medium priority
 **            Interrupt from output                        : INT_SPI0
 **            Interrupt output priority                    : medium priority
-**            Input buffer size                            : 128
-**            Output buffer size                           : 128
+**            Input buffer size                            : 0
+**            Output buffer size                           : 0
 **          Settings                                       : 
 **            Width                                        : 8 bits
 **            Input pin                                    : Enabled
@@ -54,10 +54,6 @@
 **         Disable               - byte SM1_Disable(void);
 **         RecvChar              - byte SM1_RecvChar(SM1_TComData *Chr);
 **         SendChar              - byte SM1_SendChar(SM1_TComData Chr);
-**         RecvBlock             - byte SM1_RecvBlock(SM1_TComData *Ptr, word Size, word *Rcv);
-**         SendBlock             - byte SM1_SendBlock(SM1_TComData *Ptr, word Size, word *Snd);
-**         ClearRxBuf            - byte SM1_ClearRxBuf(void);
-**         ClearTxBuf            - byte SM1_ClearTxBuf(void);
 **         GetCharsInRxBuf       - word SM1_GetCharsInRxBuf(void);
 **         GetCharsInTxBuf       - word SM1_GetCharsInTxBuf(void);
 **         SetBaudRateMode       - byte SM1_SetBaudRateMode(byte Mod);
@@ -136,16 +132,8 @@ static byte SerFlag;                   /* Flags for serial communication */
                                        /*       6 - Full RX buffer */
                                        /*       7 - Unused */
 static byte ErrFlag;                   /* Error flags for GetError method */
-static volatile word SM1_InpLen;       /* Length of input buffer's content */
-static byte InpIndexR;                 /* Index for reading from input buffer */
-static byte InpIndexW;                 /* Index for writing to input buffer */
-static SM1_TComData InpBuffer[SM1_INP_BUF_SIZE]; /* Input buffer SPI communication */
 static SM1_TComData BufferRead;        /* Input char SPI communication */
-static volatile word SM1_OutLen;       /* Length of output bufer's content */
-static byte OutIndexR;                 /* Index for reading from output buffer */
-static byte OutIndexW;                 /* Index for writing to output buffer */
-static SM1_TComData OutBuffer[SM1_OUT_BUF_SIZE]; /* Output buffer for SPI communication */
-static bool OnFreeTxBufSemaphore;      /* Disable the false calling of the OnFreeTxBuf event */
+static SM1_TComData OutBuffer;         /* Output buffer for SPI communication */
 static byte SpiClockfeatures;          /* Actual clock features state */
 static bool SetAttributeCmd;           /* Set attribute index */
 /* Internal method prototypes */
@@ -171,12 +159,10 @@ static void HWEnDi(void)
       SMasterLdd1_SelectConfiguration(SMasterLdd1_DeviceDataPtr, 0x00U, SpiClockfeatures); /* Set SPI attribute index. */
     }
     (void)SMasterLdd1_ReceiveBlock(SMasterLdd1_DeviceDataPtr, &BufferRead, 1U); /* Receive one data byte */
-    if ((SM1_OutLen) != 0U) {          /* Is number of bytes in the transmit buffer greater then 0? */
-      SerFlag |= RUNINT_FROM_TX;       /* Set flag "running int from TX"? */
-      (void)SMasterLdd1_SendBlock(SMasterLdd1_DeviceDataPtr, (LDD_TData *)&OutBuffer[OutIndexR], 1U); /* Send one data byte */
+    if ((SerFlag & FULL_TX) != 0U) {   /* Is any char in transmit buffer? */
+      (void)SMasterLdd1_SendBlock(SMasterLdd1_DeviceDataPtr, (LDD_TData *)&OutBuffer, 1U); /* Send one data byte */
     }
   } else {
-    SerFlag &= (byte)~(RUNINT_FROM_TX); /* Clear RUNINT_FROM_TX flag */
     (void)SMasterLdd1_Disable(SMasterLdd1_DeviceDataPtr); /* Disable device */
   }
 }
@@ -277,20 +263,15 @@ byte SM1_RecvChar(SM1_TComData *Chr)
 {
   register byte FlagTmp;
 
-  if (SM1_InpLen > 0U) {               /* Is number of received chars greater than 0? */
-    EnterCritical();                   /* Disable global interrupts */
-    SM1_InpLen--;                      /* Decrease number of received chars */
-    *Chr = InpBuffer[InpIndexR++];     /* Read the char */
-    if (InpIndexR >= SM1_INP_BUF_SIZE) { /* Is the index out of the receive buffer? */
-      InpIndexR = 0x00U;               /* Set index to the first item into the receive buffer */
-    }
-    FlagTmp = SerFlag;                 /* Safe the flags */
-    SerFlag &= (byte)~(OVERRUN_ERR | FULL_RX); /* Clear flag "char in RX buffer" */
-    ExitCritical();                    /* Enable global interrupts */
-  } else {
-    return ERR_RXEMPTY;                /* Receiver is empty */
+  if ((SerFlag & CHAR_IN_RX) == 0U) {  /* Is any char in RX buffer? */
+    return ERR_RXEMPTY;                /* If no then error */
   }
-  if ((FlagTmp & (OVERRUN_ERR | FULL_RX)) != 0U) { /* Is the overrun occurred? */
+  EnterCritical();                     /* Disable global interrupts */
+  *Chr = BufferRead;                   /* Read the char */
+  FlagTmp = SerFlag;                   /* Safe the flags */
+  SerFlag &= (byte)~(OVERRUN_ERR | CHAR_IN_RX | FULL_RX); /* Clear flag "char in RX buffer" */
+  ExitCritical();                      /* Enable global interrupts */
+  if ((FlagTmp & OVERRUN_ERR) != 0U) { /* Is the overrun occurred? */
     return ERR_OVERRUN;                /* If yes then return error */
   } else {
     return ERR_OK;
@@ -317,198 +298,15 @@ byte SM1_RecvChar(SM1_TComData *Chr)
 */
 byte SM1_SendChar(SM1_TComData Chr)
 {
-  if (SM1_OutLen == SM1_OUT_BUF_SIZE) { /* Is number of chars in buffer the same as the size of transmit buffer? */
+  if ((SerFlag & FULL_TX) != 0U) {     /* Is any char in the TX buffer? */
     return ERR_TXFULL;                 /* If yes then error */
   }
   EnterCritical();                     /* Disable global interrupts */
-  SM1_OutLen++;                        /* Increase number of bytes in the transmit buffer */
-  OutBuffer[OutIndexW++] = Chr;        /* Store char to buffer */
-  if (OutIndexW >= SM1_OUT_BUF_SIZE) { /* Is the index out of the transmit buffer? */
-    OutIndexW = 0x00U;                 /* Set index to the first item in the transmit buffer */
-  }
-  if ((EnUser) && ((SerFlag & RUNINT_FROM_TX) == 0U)) { /* Is the device enabled by user? */
-      SerFlag |= RUNINT_FROM_TX;       /* Set flag "running int from TX"? */
-      (void)SMasterLdd1_SendBlock(SMasterLdd1_DeviceDataPtr, (LDD_TData *)&OutBuffer[OutIndexR], 1U); /* Send one data byte */
-  }
+  SerFlag |= FULL_TX;                  /* Set the flag "full TX buffer" */
+  OutBuffer = Chr;
+  (void)SMasterLdd1_SendBlock(SMasterLdd1_DeviceDataPtr, (LDD_TData *)&OutBuffer, 1U); /* Send one data byte */
   ExitCritical();                      /* Enable global interrupts */
   return ERR_OK;
-}
-
-/*
-** ===================================================================
-**     Method      :  SM1_RecvBlock (component SynchroMaster)
-**     Description :
-**         If any data received, this method returns the block of the
-**         data and its length (and incidental error), otherwise it
-**         returns error code (it does not wait for data).
-**         If less than requested number of characters is received only
-**         the available data is copied from the receive buffer to the
-**         user specified destination and the ERR_EXEMPTY value is
-**         returned.
-**         This method is available only if non-zero length of input
-**         buffer is defined.
-**         For information about SW overrun behavior please see
-**         <General info page>.
-**     Parameters  :
-**         NAME            - DESCRIPTION
-**       * Ptr             - A pointer to the block of received data
-**         Size            - The size of the block
-**       * Rcv             - Pointer to a variable where an actual
-**                           number of copied characters is stored
-**     Returns     :
-**         ---             - Error code, possible codes:
-**                           ERR_OK - OK - The valid data is received.
-**                           ERR_SPEED - This device does not work in
-**                           the active speed mode.
-**                           ERR_RXEMPTY - It was not possible to read
-**                           requested number of bytes from the buffer.
-**                           ERR_OVERRUN - Overrun error was detected
-**                           from the last char or block received. If
-**                           interrupt service is enabled, and input
-**                           buffer allocated by the component is full,
-**                           the component behaviour depends on <Input
-**                           buffer size> property : if property is 0,
-**                           last received data-word is preserved (and
-**                           previous is overwritten), if property is
-**                           greater than 0, new received data-word are
-**                           ignored.
-**                           ERR_FAULT - Fault error was detected from
-**                           the last char or block received. In the
-**                           polling mode the ERR_FAULT is return until
-**                           the user clear the fault flag bit, but in
-**                           the interrupt mode ERR_FAULT is returned
-**                           only once after the fault error occured.
-**                           This error is supported only on the CPUs
-**                           supports the faul mode function - where
-**                           <Fault mode> property is available.
-** ===================================================================
-*/
-byte SM1_RecvBlock(SM1_TComData *Ptr,word Size,word *Rcv)
-{
-  register word count;                 /* Number of received chars */
-  register byte Result = ERR_OK;       /* Most serious error */
-  register byte ResultTmp;             /* Last error */
-
-
-  count = 0U;
-  while (count < Size) {
-    ResultTmp = SM1_RecvChar(Ptr++);   /* Receive one character */
-    if (ResultTmp > Result) {          /* Is last error most serious than through error state? */
-      Result = ResultTmp;              /* If yes then prepare error value to return */
-    }
-    if ((ResultTmp != ERR_OK)&&(ResultTmp != ERR_OVERRUN)) { /* Receiving given number of chars */
-      break;                           /* Break data block receiving */
-    }
-    count++;
-  }
-  *Rcv = count;                        /* Return number of received chars */
-  return Result;                       /* Return most serious error */
-}
-
-/*
-** ===================================================================
-**     Method      :  SM1_SendBlock (component SynchroMaster)
-**     Description :
-**         Send a block of characters to the channel. This method is
-**         only available if a non-zero length of output buffer is
-**         defined.
-**     Parameters  :
-**         NAME            - DESCRIPTION
-**       * Ptr             - Pointer to the block of data to send
-**         Size            - Size of the block
-**       * Snd             - Pointer to number of data that are sent
-**                           (moved to buffer)
-**     Returns     :
-**         ---             - Error code, possible codes:
-**                           ERR_OK - OK
-**                           ERR_SPEED - This device does not work in
-**                           the active speed mode
-**                           ERR_DISABLED - Device is disabled (only if
-**                           output DMA is supported and enabled)
-**                           ERR_TXFULL - It was not possible to send
-**                           requested number of bytes
-** ===================================================================
-*/
-byte SM1_SendBlock(SM1_TComData *Ptr, word Size, word *Snd)
-{
-  word count = 0x00U;                  /* Number of sent chars */
-  SM1_TComData *TmpPtr = Ptr;          /* Temporary output buffer pointer */
-  bool tmpOnFreeTxBufSemaphore = OnFreeTxBufSemaphore; /* Local copy of OnFreeTxBufSemaphore state */
-
-  while((count < Size) && (SM1_OutLen < SM1_OUT_BUF_SIZE)) { /* While there is some char desired to send left and output buffer is not full do */
-    EnterCritical();                   /* Enter the critical section */
-    OnFreeTxBufSemaphore = TRUE;       /* Set the OnFreeTxBufSemaphore to block OnFreeTxBuf calling */
-    SM1_OutLen++;                      /* Increase number of bytes in the transmit buffer */
-    OutBuffer[OutIndexW++] = *TmpPtr++; /* Store char to buffer */
-    if (OutIndexW >= SM1_OUT_BUF_SIZE) { /* Is the index out of the transmit buffer? */
-      OutIndexW = 0x00U;               /* Set index to the first item in the transmit buffer */
-    }
-    count++;                           /* Increase the count of sent data */
-    if ((count == Size) || (SM1_OutLen == SM1_OUT_BUF_SIZE)) { /* Is the last desired char put into buffer or the buffer is full? */
-      if (!tmpOnFreeTxBufSemaphore) {  /* Was the OnFreeTxBufSemaphore clear before enter the method? */
-        OnFreeTxBufSemaphore = FALSE;  /* If yes then clear the OnFreeTxBufSemaphore */
-      }
-    }
-    if ((EnUser) && ((SerFlag & RUNINT_FROM_TX) == 0U)) { /* Is the device enabled by user? */
-      SerFlag |= RUNINT_FROM_TX;       /* Set flag "running int from TX"? */
-      (void)SMasterLdd1_SendBlock(SMasterLdd1_DeviceDataPtr, (LDD_TData *)&OutBuffer[OutIndexR], 1U); /* Send one data byte */
-    }
-    ExitCritical();                    /* Exit the critical section */
-  }
-  *Snd = count;                        /* Return number of sent chars */
-  if (count != Size) {                 /* Is the number of sent chars less then desired number of chars */
-    return ERR_TXFULL;                 /* If yes then error */
-  }
-  return ERR_OK;                       /* OK */
-}
-
-/*
-** ===================================================================
-**     Method      :  SM1_ClearRxBuf (component SynchroMaster)
-**     Description :
-**         Clears the receive buffer. This method is available only if
-**         a non-zero length of input buffer is defined.
-**     Parameters  : None
-**     Returns     :
-**         ---             - Error code, possible codes:
-**                           ERR_OK - OK
-**                           ERR_SPEED - This device does not work in
-**                           the active speed mode
-** ===================================================================
-*/
-byte SM1_ClearRxBuf(void)
-{
-  EnterCritical();                     /* Disable global interrupts */
-  SM1_InpLen = 0U;                     /* Set number of chars in the transmit buffer to 0 */
-  InpIndexW = 0x00U;                   /* Set index on the first item in the transmit buffer */
-  InpIndexR = 0x00U;
-  SerFlag &= (byte)~(OVERRUN_ERR | FULL_RX); /* Clear flags */
-  ExitCritical();                      /* Enable global interrupts */
-  return ERR_OK;                       /* OK */
-}
-
-/*
-** ===================================================================
-**     Method      :  SM1_ClearTxBuf (component SynchroMaster)
-**     Description :
-**         Clears the transmit buffer. This method is only available if
-**         a non-zero length of output buffer is defined.
-**     Parameters  : None
-**     Returns     :
-**         ---             - Error code, possible codes:
-**                           ERR_OK - OK
-**                           ERR_SPEED - This device does not work in
-**                           the active speed mode
-** ===================================================================
-*/
-byte SM1_ClearTxBuf(void)
-{
-  EnterCritical();                     /* Disable global interrupts */
-  SM1_OutLen = 0U;                     /* Set number of chars in the receive buffer to 0 */
-  OutIndexW = 0x00U;                   /* Set index on the first item in the receive buffer */
-  OutIndexR = 0x00U;
-  ExitCritical();                      /* Enable global interrupts */
-  return ERR_OK;                       /* OK */
 }
 
 /*
@@ -527,7 +325,7 @@ byte SM1_ClearTxBuf(void)
 */
 word SM1_GetCharsInRxBuf(void)
 {
-  return SM1_InpLen;                   /* Return number of chars in receive buffer */
+  return ((word)(((SerFlag & CHAR_IN_RX) != 0U)? 1U:0U)); /* Return number of chars in receive buffer */
 }
 
 /*
@@ -542,7 +340,7 @@ word SM1_GetCharsInRxBuf(void)
 */
 word SM1_GetCharsInTxBuf(void)
 {
-  return SM1_OutLen;                   /* Return number of chars in the transmit buffer */
+  return (((SerFlag & FULL_TX) != 0U)? 1U : 0U); /* Return number of chars in the transmit buffer */
 }
 
 /*
@@ -702,7 +500,6 @@ byte SM1_GetError(SM1_TError *Err)
   EnterCritical();                     /* Disable global interrupts */
   Err->err = 0U;
   Err->errName.OverRun = (((ErrFlag & OVERRUN_ERR) != 0U)? 1U : 0U); /* Overrun error */
-  Err->errName.RxBufOvf = (((ErrFlag & FULL_RX) != 0U)? 1U : 0U); /* Buffer overflow */
   ErrFlag = 0x00U;                     /* Reset error flags */
   ExitCritical();                      /* Enable global interrupts */
   return ERR_OK;                       /* OK */
@@ -723,16 +520,9 @@ void SM1_Init(void)
 {
   SerFlag = 0U;                        /* Reset all flags */
   ErrFlag = 0U;                        /* Reset all flags in mirror */
-  OnFreeTxBufSemaphore = FALSE;        /* Clear the OnFreeTxBufSemaphore */
   SpiClockfeatures = 0x00U;            /* Initialize actual clock feature state */
   SetAttributeCmd = FALSE;             /* Disable settings SPI attribute in enable */
   EnUser = TRUE;                       /* Enable device */
-  SM1_InpLen = 0U;                     /* No char in the receive buffer */
-  InpIndexR = 0x00U;                   /* Set index on the first item in the receive buffer */
-  InpIndexW = 0x00U;
-  SM1_OutLen = 0U;                     /* No char in the transmit buffer */
-  OutIndexR = 0x00U;                   /* Set index on the first item in the transmit buffer */
-  OutIndexW = 0x00U;
   SMasterLdd1_DeviceDataPtr = SMasterLdd1_Init(NULL); /* Calling init method of the inherited component */
   HWEnDi();                            /* Enable/disable device according to the status flags */
 }
@@ -759,30 +549,16 @@ void SMasterLdd1_OnBlockReceived(LDD_TUserData *UserDataPtr)
   register byte Flags = 0U;            /* Temporary variable for flags */
 
   (void)UserDataPtr;                   /* Parameter is not used, suppress unused argument warning */
-  if (SM1_InpLen < SM1_INP_BUF_SIZE) { /* Is number of bytes in the receive buffer lower than size of buffer? */
-    SM1_InpLen++;                      /* Increase number of chars in the receive buffer */
-    InpBuffer[InpIndexW++] = (SM1_TComData)BufferRead; /* Save received char to the receive buffer */
-    if (InpIndexW >= SM1_INP_BUF_SIZE) { /* Is the index out of the receive buffer? */
-      InpIndexW = 0x00U;               /* Set index on the first item into the receive buffer */
-    }
-    Flags |= ON_RX_CHAR;               /* If yes then set the OnRxChar flag */
-    if (SM1_InpLen == SM1_INP_BUF_SIZE) { /* Is number of bytes in the receive buffer equal to the size of buffer? */
-      Flags |= ON_FULL_RX;             /* Set flag "OnFullRxBuf" */
-    }
-  } else {
-    SerFlag |= FULL_RX;                /* Set flag "full RX buffer" */
-    ErrFlag |= FULL_RX;                /* Set flag "full RX buffer" for GetError method */
-    Flags |= ON_ERROR;                 /* Set the OnError flag */
+  if ((SerFlag & CHAR_IN_RX) != 0U) {  /* Is the overrun error flag set? */
+    SerFlag |= OVERRUN_ERR;            /* If yes then set the Error flag for RecvChar/Block method */
+    ErrFlag |= OVERRUN_ERR;            /* If yes then set the Error flag for GetError method */
+    Flags |= ON_ERROR;                 /* If yes then set the OnError flag */
   }
+  SerFlag |= CHAR_IN_RX;               /* Set flag "char in RX buffer" */
   if ((Flags & ON_ERROR) != 0U) {      /* Is any error flag set? */
     SM1_OnError();                     /* Invoke user event */
   } else {
-    if ((Flags & ON_RX_CHAR) != 0U) {  /* Is OnRxChar flag set? */
-      SM1_OnRxChar();                  /* Invoke user event */
-    }
-    if ((Flags & ON_FULL_RX) != 0U) {  /* Is OnTxChar flag set? */
-      SM1_OnFullRxBuf();               /* Invoke user event */
-    }
+    SM1_OnRxChar();                    /* Invoke user event */
   }
   (void)SMasterLdd1_ReceiveBlock(SMasterLdd1_DeviceDataPtr, &BufferRead, 1U); /* Receive one data byte */
 }
@@ -804,32 +580,9 @@ void SMasterLdd1_OnBlockReceived(LDD_TUserData *UserDataPtr)
 */
 void SMasterLdd1_OnBlockSent(LDD_TUserData *UserDataPtr)
 {
-  register byte Flags = 0U;            /* Temporary variable for flags */
-
   (void)UserDataPtr;                   /* Parameter is not used, suppress unused argument warning */
-  if ((SerFlag & RUNINT_FROM_TX) != 0U) { /* Is flag "running int from TX" set? */
-    Flags |= ON_TX_CHAR ;              /* Set the OnTXChar flag */
-  }
-  OutIndexR++;
-  if (OutIndexR >= SM1_OUT_BUF_SIZE) { /* Is the index out of the transmit buffer? */
-    OutIndexR = 0x00U;                 /* Set index on the first item into the transmit buffer */
-  }
-  SM1_OutLen--;                        /* Decrease number of chars in the transmit buffer */
-  if (SM1_OutLen != 0U) {              /* Is number of bytes in the transmit buffer greater then 0? */
-    SerFlag |= RUNINT_FROM_TX;         /* Set flag "running int from TX"? */
-    (void)SMasterLdd1_SendBlock(SMasterLdd1_DeviceDataPtr, (LDD_TData *)&OutBuffer[OutIndexR], 1U); /* Send one data byte */
-  } else {
-    SerFlag &= (byte)~(RUNINT_FROM_TX | FULL_TX); /* Clear "running int from TX" and "full TX buff" flags */
-    if (!(OnFreeTxBufSemaphore)) {     /* Is the OnFreeTXBuf flag blocked ?*/
-      Flags |= ON_FREE_TX;             /* If not, set the OnFreeTxBuf flag */
-    }
-  }
-  if ((Flags & ON_TX_CHAR) != 0U) {    /* Is flag "OnTxChar" set? */
-    SM1_OnTxChar();                    /* Invoke user event */
-  }
-  if ((Flags & ON_FREE_TX) != 0U) {    /* Is flag "OnFreeTxBuf" set? */
-    SM1_OnFreeTxBuf();                 /* Invoke user event */
-  }
+  SerFlag &= (byte)~(FULL_TX);         /* Reset flag "full TX buffer" */
+  SM1_OnTxChar();                      /* Invoke user event */
 }
 
 /* END SM1. */

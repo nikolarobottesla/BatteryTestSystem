@@ -5,9 +5,9 @@
 **     Processor   : MKL25Z128VLK4
 **     Component   : SD_Card
 **     Version     : Component 01.178, Driver 01.00, CPU db: 3.00.000
-**     Repository  : mcuoneclipse
+**     Repository  : My Components
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-11-09, 19:47, # CodeGen: 45
+**     Date/Time   : 2015-11-15, 09:37, # CodeGen: 44
 **     Abstract    :
 **         Implements interface to SD card for FatFs
 **     Settings    :
@@ -33,7 +33,7 @@
 **              non-LDD SS                                 : Disabled
 **            Activate                                     : Disabled
 **            Card detection                               : Enabled
-**              Card Detect is LOW active                  : yes
+**              Card Detect is LOW active                  : no
 **              LDD CD                                     : Enabled
 **                Card detection pin                       : LDDCDI
 **              non-LDD CD                                 : Disabled
@@ -302,7 +302,7 @@ byte SD1_ReceiveByte(void);
 */
 
 #define SD1_CardPresent() \
-  (bool)(CD1_GetVal(CD1_DeviceData)==0) /* low level means card present */
+  (bool)(CD1_GetVal(CD1_DeviceData)!=0) /* high level means card present */
 
 /*
 ** ===================================================================

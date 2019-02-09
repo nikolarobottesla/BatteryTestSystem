@@ -5,9 +5,9 @@
 **     Processor   : MKL25Z128VLK4
 **     Component   : FreeRTOS
 **     Version     : Component 01.438, Driver 01.00, CPU db: 3.00.000
-**     Repository  : mcuoneclipse
+**     Repository  : My Components
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-11-08, 22:04, # CodeGen: 44
+**     Date/Time   : 2015-11-15, 09:37, # CodeGen: 44
 **     Abstract    :
 **          This component implements the FreeRTOS Realtime Operating System
 **     Settings    :

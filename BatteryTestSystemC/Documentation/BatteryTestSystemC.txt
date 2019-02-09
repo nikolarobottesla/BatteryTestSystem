@@ -688,15 +688,6 @@ Module "SM1"       (component HWSPI)
    - SM1_RecvChar -If any data is received, this method returns one character, otherwise it returns an error code (it does not 
                 wait for data).   For information about SW overrun behavior please see <General info page>.
    - SM1_SendChar -Sends one character to the channel.
-   - SM1_RecvBlock -If any data received, this method returns the block of the data and its length (and incidental error), 
-                otherwise it returns error code (it does not wait for data).  If less than requested number of characters is 
-                received only the available data is copied from the receive buffer to the user specified destination and the 
-                ERR_EXEMPTY value is returned.  This method is available only if non-zero length of input buffer is defined.    
-                For information about SW overrun behavior please see <General info page>.
-   - SM1_SendBlock -Send a block of characters to the channel. This method is only available if a non-zero length of output 
-                buffer is defined.
-   - SM1_ClearRxBuf -Clears the receive buffer. This method is available only if a non-zero length of input buffer is defined.
-   - SM1_ClearTxBuf -Clears the transmit buffer. This method is only available if a non-zero length of output buffer is defined.
    - SM1_GetCharsInRxBuf -Returns the number of characters in the input buffer.  Note: If the Interrupt service is disabled, 
                 and the Ignore empty character is set to yes, and a character has been received, then this method returns 1 
                 although it was an empty character.
